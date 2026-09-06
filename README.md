@@ -9,8 +9,8 @@ Task: classificazione binaria, prevedere l'**abbandono** dello studente.
 |---|---|---|
 | 1 | Preprocessing e preparazione dati | ✅ completato |
 | 2 | Classificatori costruiti a mano su `manuale.csv` | ✅ completato |
-| 3 | Data quality ed EDA su `training.csv` | da fare |
-| 4 | Valutazione dei classificatori manuali sui dati completi | da fare |
+| 3 | Data quality ed EDA su `training.csv` | ✅ completato |
+| 4 | Valutazione dei classificatori manuali sui dati completi | ✅ completato |
 | 5 | Modelli Scikit-Learn e scelta del classificatore finale | da fare |
 
 ## Struttura
@@ -20,6 +20,8 @@ Project/
 ├── 01_preprocessing.ipynb       Task 1: codice e verifiche numeriche
 ├── 02.1_naive_bayes.ipynb       Task 2: Naive Bayes costruito a mano
 ├── 02.2_albero_decisione.ipynb  Task 2: albero di decisione costruito a mano
+├── 03_analisi_esplorativa.ipynb Task 3: controlli di qualità, distribuzioni, correlazioni
+├── 04_valutazione.ipynb         Task 4: ottimizzazione dei classificatori manuali
 ├── preprocessing.py             la trasformazione del Task 1, richiamabile sul file d'esame
 ├── manuale.csv                  12 studenti (6 abbandoni + 6 no), per il Task 2
 ├── training.csv                 7.035 studenti, per i Task 3-5
@@ -27,7 +29,9 @@ Project/
 │   ├── README.md                indice e convenzioni comuni a tutti i task
 │   ├── 01_preprocessing.md      documentazione del Task 1
 │   ├── 02.1_naive_bayes.md      documentazione del Naive Bayes
-│   └── 02.2_albero_decisione.md documentazione dell'albero di decisione
+│   ├── 02.2_albero_decisione.md documentazione dell'albero di decisione
+│   ├── 03_analisi_esplorativa.md documentazione del Task 3
+│   └── 04_valutazione.md        documentazione del Task 4
 ├── data/act-mooc/               i tre TSV originali (non versionati)
 └── requirements.txt
 ```
