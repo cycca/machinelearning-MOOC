@@ -14,9 +14,15 @@ verificano: le spiegazioni per esteso sono in questi file.
 | documento | task | contenuto |
 |---|---|---|
 | [01_preprocessing.md](01_preprocessing.md) | 1 | dal livello azione al livello studente, le 8 feature, `manuale.csv` e `training.csv` |
+| [02.1_naive_bayes.md](02.1_naive_bayes.md) | 2 | primo classificatore manuale: Naive Bayes discretizzato, con correzione di Laplace |
+| [02.2_albero_decisione.md](02.2_albero_decisione.md) | 2 | secondo classificatore manuale: albero di decisione (ID3) |
 
-Da produrre: `02_classificatori_manuali.md` (Task 2), `03_analisi_esplorativa.md` (Task 3),
-`04_valutazione.md` (Task 4), `05_modellazione.md` (Task 5).
+Il Task 2 è diviso in due documenti perché il gruppo è di **due componenti** e la consegna chiede
+*«uno o due classificatori a seconda del numero di componenti»*: un classificatore per ciascuno,
+ma entrambi i membri devono saper spiegare tutti e due.
+
+Da produrre: `03_analisi_esplorativa.md` (Task 3), `04_valutazione.md` (Task 4),
+`05_modellazione.md` (Task 5).
 
 ## Schema di ogni sezione
 
@@ -33,6 +39,8 @@ Da produrre: `02_classificatori_manuali.md` (Task 2), `03_analisi_esplorativa.md
 | file | ruolo |
 |---|---|
 | `01_preprocessing.ipynb` | esecuzione del Task 1 e verifiche numeriche |
+| `02.1_naive_bayes.ipynb` | Naive Bayes costruito a mano su `manuale.csv` |
+| `02.2_albero_decisione.ipynb` | albero di decisione costruito a mano su `manuale.csv` |
 | `preprocessing.py` | la trasformazione del Task 1 come funzione, per il file d'esame |
 | `manuale.csv` | 12 campioni (6+6) per i classificatori manuali del Task 2 |
 | `training.csv` | 7.035 campioni per i Task 3, 4 e 5 |
