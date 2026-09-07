@@ -45,9 +45,17 @@ riproducano esattamente i risultati di allora prima di usarle.
 `manuale.csv`; il Naive Bayes fa 1,0000. Sono gli stessi classificatori, non una riscrittura
 approssimativa.
 
+**Attenzione a un dettaglio che spiega una differenza fra documenti.** Nel Task 2.1 il Naive Bayes
+otteneva **0,7790** su `training.csv`, qui ottiene **0,7902**. Non è una discrepanza: sono due
+protocolli diversi. Nel Task 2 *tutto* il modello — priori e probabilità condizionate — era stimato
+sui dodici campioni; qui dai dodici campioni vengono solo le **soglie di discretizzazione**, mentre
+le condizionate sono ristimate sulle pieghe di addestramento, che è il modo corretto di valutarlo in
+cross-validation. L'albero invece dà esattamente lo stesso 0,7734 in entrambi i documenti, perché la
+sua regola è completamente fissata dalla soglia e non c'è nulla da ristimare.
+
 | classificatore del Task 2 | accuratezza (CV) | dev.std | F1 |
 |---|---|---|---|
-| Naive Bayes (mediane di `manuale.csv`) | 0,7902 | 0,0075 | 0,8184 |
+| Naive Bayes (soglie di `manuale.csv`) | 0,7902 | 0,0075 | 0,8184 |
 | albero (soglia 22,5 dai 12 campioni) | 0,7734 | 0,0088 | 0,8031 |
 
 ---

@@ -17,7 +17,14 @@ tabella, così il percorso di preprocessing usato all'esame è identico a quello
 usato in addestramento.
 """
 
+from pathlib import Path
+
 import pandas as pd
+
+# I dati grezzi stanno in Project/data/act-mooc/, questo modulo in Project/notebooks/.
+# Il percorso è risolto rispetto al file del modulo e non alla cartella di lavoro,
+# così `carica_azioni()` funziona da qualunque directory venga lanciata.
+CARTELLA_DATI = Path(__file__).resolve().parent.parent / "data" / "act-mooc"
 
 COLONNE_FEATURE = ["FEATURE0", "FEATURE1", "FEATURE2", "FEATURE3"]
 COLONNE_STUDENTE = ["n_azioni", "n_attivita_distinte", "n_giorni_attivi", "durata_giorni",
@@ -25,7 +32,7 @@ COLONNE_STUDENTE = ["n_azioni", "n_attivita_distinte", "n_giorni_attivi", "durat
 SECONDI_IN_UN_GIORNO = 86400
 
 
-def carica_azioni(cartella="data/act-mooc/"):
+def carica_azioni(cartella=None):
     """Unisce i tre TSV di act-mooc in un'unica tabella a livello azione.
 
     L'unione è **per posizione** e non con un `merge`: in `mooc_action_labels.tsv`
@@ -35,9 +42,10 @@ def carica_azioni(cartella="data/act-mooc/"):
     hanno lo stesso numero di righe nello stesso ordine, quindi la riga i-esima
     descrive la stessa azione in tutti e tre.
     """
-    azioni = pd.read_csv(cartella + "mooc_actions.tsv", sep="\t")
-    feature = pd.read_csv(cartella + "mooc_action_features.tsv", sep="\t")
-    etichette = pd.read_csv(cartella + "mooc_action_labels.tsv", sep="\t")
+    cartella = Path(cartella) if cartella is not None else CARTELLA_DATI
+    azioni = pd.read_csv(cartella / "mooc_actions.tsv", sep="\t")
+    feature = pd.read_csv(cartella / "mooc_action_features.tsv", sep="\t")
+    etichette = pd.read_csv(cartella / "mooc_action_labels.tsv", sep="\t")
 
     if not (len(azioni) == len(feature) == len(etichette)):
         raise ValueError("i tre file non hanno lo stesso numero di righe: "
