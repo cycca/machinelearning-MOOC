@@ -1,6 +1,9 @@
 # Previsione dell'abbandono in una piattaforma MOOC
 
 Progetto di Fondamenti e Applicazioni del Machine Learning, A.A. 2026.
+Studenti: **Federico Ciccarelli**, **Lorenzo Lallone**. Docenti: prof. Fabrizio Rossi, prof. Fabio
+Persia.
+
 Dataset *act-mooc* (Stanford SNAP): 411.749 azioni di 7.047 studenti. Classificazione binaria —
 prevedere l'abbandono.
 

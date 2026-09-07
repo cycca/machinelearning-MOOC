@@ -1,6 +1,8 @@
 # Sintesi del progetto — guida allo studio
 
-**Corso.** Fondamenti e Applicazioni del Machine Learning, A.A. 2026.
+**Corso.** Fondamenti e Applicazioni del Machine Learning, A.A. 2026 — prof. Fabrizio Rossi,
+prof. Fabio Persia.
+**Studenti.** Federico Ciccarelli, Lorenzo Lallone.
 **Dataset.** *act-mooc* (Stanford SNAP): 411.749 azioni di 7.047 studenti su 97 attività di una
 piattaforma MOOC, in circa 30 giorni.
 **Task.** Classificazione binaria — prevedere l'**abbandono** dello studente.
@@ -221,11 +223,11 @@ un'ipotesi e l'abbiamo testata:
 | soglie stimate da | accuratezza | confronto appaiato |
 |---|---|---|
 | `manuale.csv` (12 campioni, **bilanciato**) | 0,7902 | — |
+| `training.csv` così com'è (57,7% positivi) | 0,7775 | perde **5 pieghe su 5** |
+| `training.csv` **ribilanciato** | 0,7889 | pareggia (2/5) |
 
 *(0,7902 e non 0,7790 perché qui dai 12 campioni vengono solo le **soglie**: le probabilità
 condizionate sono ristimate su ogni piega di addestramento.)*
-| `training.csv` così com'è (57,7% positivi) | 0,7775 | perde **5 pieghe su 5** |
-| `training.csv` **ribilanciato** | 0,7889 | pareggia (2/5) |
 
 Il divario sparisce appena si ribilancia. Conclusione: per una soglia di taglio **non conta la
 numerosità del campione, conta che rappresenti equamente le due classi**.
@@ -409,5 +411,8 @@ Dichiararli prima che li trovi il docente è la parte più importante dell'espos
    perché in combinazione contribuiscono, ma non ci si deve aspettare nulla da loro.
 4. **La finestra di osservazione è di 29,77 giorni.** `n_azioni` e `durata_giorni` dipendono da
    quella ampiezza: un file d'esame con una finestra diversa produrrebbe feature su scala diversa.
+   Misurato nel Task 5: su storie complete il modello fa 0,7833, su una fetta del log 0,05–0,22.
+   `preprocessing.py` avvisa quando la mediana di `n_azioni` è meno di un terzo di quella di
+   `training.csv`.
 5. **Un suggerimento del Task 3 si è rivelato sbagliato** (`RobustScaler`): l'abbiamo verificato
    e riportato invece di rimuoverlo.

@@ -26,6 +26,11 @@ COLONNE_STUDENTE = ["n_azioni", "n_attivita_distinte", "n_giorni_attivi", "durat
                     "feature0_media", "feature1_media", "feature2_media", "feature3_media"]
 SECONDI_IN_UN_GIORNO = 86400
 
+# Nomi che nel dataset grezzo sono maiuscoli: un file d'esame potrebbe averli in minuscolo.
+COLONNE_GREZZE = {"ACTIONID", "USERID", "TARGETID", "TIMESTAMP", "LABEL", "ABBANDONO",
+                  *COLONNE_FEATURE}
+N_AZIONI_MEDIANA_TRAINING = 37      # mediana di training.csv, per riconoscere un log troncato
+
 
 def carica_azioni(cartella=None):
     """Unisce i tre TSV di act-mooc in un'unica tabella a livello azione.
@@ -111,6 +116,16 @@ def carica_per_predire(percorso, cartella_grezzi=None):
     sempre le otto colonne di `training.csv`, nello stesso ordine.
     """
     df = pd.read_csv(percorso, sep=None, engine="python")
+    df = df.rename(columns=lambda c: c.upper() if c.upper() in COLONNE_GREZZE else c)
     studenti = costruisci_studenti(df)
+
+    # Un file che contiene solo una fetta del log dà storie troncate: le feature finiscono
+    # su una scala diversa da quella di addestramento e le previsioni non valgono nulla.
+    mediana = studenti["n_azioni"].median()
+    if mediana < N_AZIONI_MEDIANA_TRAINING / 3:
+        print(f"ATTENZIONE: n_azioni ha mediana {mediana:.0f} contro {N_AZIONI_MEDIANA_TRAINING} "
+              "in training.csv. Il file sembra contenere storie troncate e non complete: le "
+              "feature non sono confrontabili con quelle di addestramento.")
+
     y = studenti["ABBANDONO"] if "ABBANDONO" in studenti.columns else None
     return studenti[COLONNE_STUDENTE], y

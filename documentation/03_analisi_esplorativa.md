@@ -87,6 +87,8 @@ istogrammi per classe delle quattro feature di quantità.
 `feature3_media` intorno a 0: una scala comune renderebbe illeggibili sette riquadri su otto. Gli
 outlier non sono disegnati perché schiaccerebbero i quartili — sono già analizzati al punto 2.3.
 
+![Distribuzione di ogni feature per classe](figure/eda_boxplot_per_classe.png)
+
 **Verificato.** Le quattro feature di quantità separano nettamente i gruppi, con gli abbandoni sui
 valori bassi. Le `feature*_media` hanno mediane e quartili quasi sovrapposti, tranne parzialmente
 `feature0_media`.
@@ -108,6 +110,8 @@ originali.
 | `FEATURE0` | **86,9%** | 27 |
 | `FEATURE1` | **83,0%** | 16 |
 | `FEATURE2` | 64,5% | 87 |
+
+![Le FEATURE grezze sono quasi costanti](figure/eda_feature_grezze.png)
 
 Sono standardizzate (deviazione standard 1,000) ma quasi costanti. Fare la media di una variabile
 che non varia produce una feature che non varia.
@@ -136,6 +140,8 @@ che non varia produce una feature che non varia.
 | `feature2_media` | +0,08 |
 | `feature1_media` | −0,03 |
 | `feature3_media` | +0,01 |
+
+![Matrice di correlazione](figure/eda_correlazione.png)
 
 Le quattro feature di quantità sono anche **fortemente correlate fra loro**: da 0,69 a **0,91**, con
 il massimo fra `n_azioni` e `n_attivita_distinte`.

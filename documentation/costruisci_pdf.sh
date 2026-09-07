@@ -111,6 +111,8 @@ cat > "$TEMP/frontespizio.html" <<'FINE_FRONTESPIZIO'
   <h1>Previsione dell&rsquo;abbandono in una piattaforma MOOC</h1>
   <p class="sottotitolo">Progetto di Fondamenti e Applicazioni del Machine Learning<br>Anno Accademico 2026</p>
   <table class="meta">
+    <tr><td>Studenti</td><td>Federico Ciccarelli &middot; Lorenzo Lallone</td></tr>
+    <tr><td>Docenti</td><td>prof. Fabrizio Rossi &middot; prof. Fabio Persia</td></tr>
     <tr><td>Dataset</td><td>act-mooc (Stanford SNAP) &mdash; 411.749 azioni, 7.047 studenti</td></tr>
     <tr><td>Task</td><td>classificazione binaria &mdash; abbandono dello studente</td></tr>
     <tr><td>Modello finale</td><td>regressione logistica &mdash; 79,25% di accuratezza sul test set</td></tr>
