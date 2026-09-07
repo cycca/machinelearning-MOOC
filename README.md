@@ -11,7 +11,7 @@ Task: classificazione binaria, prevedere l'**abbandono** dello studente.
 | 2 | Classificatori costruiti a mano su `manuale.csv` | ✅ completato |
 | 3 | Data quality ed EDA su `training.csv` | ✅ completato |
 | 4 | Valutazione dei classificatori manuali sui dati completi | ✅ completato |
-| 5 | Modelli Scikit-Learn e scelta del classificatore finale | da fare |
+| 5 | Modelli Scikit-Learn e scelta del classificatore finale | ✅ completato |
 
 ## Struttura
 
@@ -22,6 +22,7 @@ Project/
 ├── 02.2_albero_decisione.ipynb  Task 2: albero di decisione costruito a mano
 ├── 03_analisi_esplorativa.ipynb Task 3: controlli di qualità, distribuzioni, correlazioni
 ├── 04_valutazione.ipynb         Task 4: ottimizzazione dei classificatori manuali
+├── 05_modellazione.ipynb        Task 5: modelli sklearn e classificatore finale
 ├── preprocessing.py             la trasformazione del Task 1, richiamabile sul file d'esame
 ├── manuale.csv                  12 studenti (6 abbandoni + 6 no), per il Task 2
 ├── training.csv                 7.035 studenti, per i Task 3-5
@@ -31,7 +32,8 @@ Project/
 │   ├── 02.1_naive_bayes.md      documentazione del Naive Bayes
 │   ├── 02.2_albero_decisione.md documentazione dell'albero di decisione
 │   ├── 03_analisi_esplorativa.md documentazione del Task 3
-│   └── 04_valutazione.md        documentazione del Task 4
+│   ├── 04_valutazione.md        documentazione del Task 4
+│   └── 05_modellazione.md       documentazione del Task 5
 ├── data/act-mooc/               i tre TSV originali (non versionati)
 └── requirements.txt
 ```
@@ -61,4 +63,9 @@ la stessa funzione usata in addestramento.
 ```python
 import preprocessing as pp
 X, y = pp.carica_per_predire("real_settings.csv")   # log di azioni o tabella gia' aggregata
+previsioni = finale.predict(X)                      # `finale` viene da 05_modellazione.ipynb
 ```
+
+Il classificatore finale è una **regressione logistica** (`StandardScaler`, `C = 0,1`): 79,25% di
+accuratezza sul test set. Non è salvato su disco — si riottiene eseguendo `05_modellazione.ipynb`,
+che impiega meno di un minuto.
