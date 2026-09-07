@@ -1,71 +1,73 @@
-# Progetto di Fondamenti e Applicazioni del Machine Learning — A.A. 2026
+# Previsione dell'abbandono in una piattaforma MOOC
 
-Dataset assegnato: **Dataset 1 — MOOC User Action Dataset** (*act-mooc*, Stanford SNAP).
-Task: classificazione binaria, prevedere l'**abbandono** dello studente.
+Progetto di Fondamenti e Applicazioni del Machine Learning, A.A. 2026.
+Dataset *act-mooc* (Stanford SNAP): 411.749 azioni di 7.047 studenti. Classificazione binaria —
+prevedere l'abbandono.
 
-## Stato
-
-| task | descrizione | stato |
-|---|---|---|
-| 1 | Preprocessing e preparazione dati | ✅ completato |
-| 2 | Classificatori costruiti a mano su `manuale.csv` | ✅ completato |
-| 3 | Data quality ed EDA su `training.csv` | ✅ completato |
-| 4 | Valutazione dei classificatori manuali sui dati completi | ✅ completato |
-| 5 | Modelli Scikit-Learn e scelta del classificatore finale | ✅ completato |
+Il classificatore finale è una regressione logistica: **79,25%** di accuratezza sul test set, contro
+una baseline del 57,71%.
 
 ## Struttura
 
 ```
-Project/
-├── data/
-│   ├── manuale.csv              12 studenti (6 abbandoni + 6 no), per il Task 2
-│   ├── training.csv             7.035 studenti, per i Task 3-5
-│   └── act-mooc/                i tre TSV originali (non versionati)
-├── notebooks/
-│   ├── 01_preprocessing.ipynb   Task 1: dal livello azione al livello studente
-│   ├── 02.1_naive_bayes.ipynb   Task 2: Naive Bayes costruito a mano
-│   ├── 02.2_albero_decisione.ipynb  Task 2: albero di decisione costruito a mano
-│   ├── 03_analisi_esplorativa.ipynb Task 3: data quality ed EDA
-│   ├── 04_valutazione.ipynb     Task 4: ottimizzazione dei classificatori manuali
-│   ├── 05_modellazione.ipynb    Task 5: modelli sklearn e classificatore finale
-│   └── preprocessing.py         la trasformazione del Task 1, per il file d'esame
-├── documentation/
-│   ├── 00_sintesi.md            guida allo studio: filo conduttore e domande d'orale
-│   ├── 01_preprocessing.md … 05_modellazione.md
-│   ├── figure/                  figure estratte dai notebook
-│   └── costruisci_pdf.sh        genera il PDF unico (fuori dal progetto)
-├── README.md
-└── requirements.txt
+data/            manuale.csv (12 studenti), training.csv (7.035), act-mooc/ (grezzi, non versionati)
+notebooks/       i sei notebook, in ordine, + preprocessing.py
+documentation/   i sette .md e lo script che li assembla in un PDF
 ```
 
-## Come riprodurre
+## Far girare il progetto
 
-I dati grezzi non sono versionati. Vanno scaricati da
-<https://snap.stanford.edu/data/act-mooc.html> ed estratti in `data/`, così da ottenere
-`data/act-mooc/mooc_actions.tsv`, `mooc_action_features.tsv` e `mooc_action_labels.tsv`.
+I dati grezzi non sono versionati (53 MB). Scaricali da
+<https://snap.stanford.edu/data/act-mooc.html> ed estraili in `data/`, così da ottenere
+`data/act-mooc/mooc_actions.tsv` e gli altri due TSV.
 
 ```bash
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-jupyter lab notebooks/  # eseguire i notebook in ordine, dall'alto in basso
+jupyter lab notebooks/
 ```
 
-Il notebook rigenera `manuale.csv` e `training.csv`. Tutte le estrazioni casuali usano
-`random_state=42`, quindi il risultato è identico a ogni esecuzione.
+Esegui i notebook in ordine, dall'alto in basso. Il primo rigenera `manuale.csv` e `training.csv`:
+tutte le estrazioni casuali usano `random_state=42`, quindi i file escono identici a ogni
+esecuzione.
 
-## Il file d'esame
+**Attenzione.** I notebook leggono i dati con percorsi relativi alla propria cartella
+(`../data/...`). Se li lanci da altrove, quei percorsi non si risolvono. `preprocessing.py` invece
+risolve il percorso rispetto al file del modulo, quindi funziona da qualunque directory.
 
-Le 8 feature di `training.csv` sono definite da noi e non esistono nel dataset originale: il
-`real_settings.csv` fornito in sede d'esame arriverà quindi come log di azioni, da trasformare con
-la stessa funzione usata in addestramento.
+## Usare il modello sul file d'esame
+
+Le 8 feature sono definite da noi e non esistono nel dataset originale, quindi `real_settings.csv`
+va trasformato prima di darlo al modello.
 
 ```python
 import preprocessing as pp
-X, y = pp.carica_per_predire("real_settings.csv")   # log di azioni o tabella gia' aggregata
+X, y = pp.carica_per_predire("real_settings.csv")   # log di azioni o tabella già aggregata
 previsioni = finale.predict(X)                      # `finale` viene da 05_modellazione.ipynb
 ```
 
-Il classificatore finale è una **regressione logistica** (`StandardScaler`, `C = 0,1`): 79,25% di
-accuratezza sul test set. Non è salvato su disco — si riottiene eseguendo `05_modellazione.ipynb`,
-che impiega meno di un minuto.
+`carica_per_predire` accetta entrambi i formati e restituisce `y = None` se manca la colonna delle
+etichette. Il modello non è salvato su disco: si riottiene eseguendo `05_modellazione.ipynb`, meno
+di un minuto.
+
+## Produrre il PDF
+
+```bash
+cd documentation && ./costruisci_pdf.sh
+```
+
+Scrive `progetto_ML_2026.pdf` **fuori dal progetto**, in `machine_learning/`. Serve
+`sudo dnf install pandoc-cli python3-weasyprint`.
+
+## Limiti dichiarati
+
+- La relazione «poca attività → abbandono» è in parte **tautologica**: un abbandono è per
+  definizione la fine dell'attività. Su una finestra iniziale di osservazione l'AUC scende da 0,877
+  a **0,535**.
+- Le feature di quantità sono correlate fra loro fino a **0,91**: i coefficienti del modello non
+  sono interpretabili singolarmente.
+- Tre feature su otto sono quasi prive di segnale, per un difetto del dataset originale
+  (`FEATURE3` ha lo stesso valore nel 93,5% delle azioni).
+- `n_azioni` e `durata_giorni` dipendono dall'ampiezza della finestra di osservazione (29,77
+  giorni): un file con una finestra diversa produrrebbe feature su scala diversa.

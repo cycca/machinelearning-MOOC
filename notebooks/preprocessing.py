@@ -1,20 +1,15 @@
 """
 Preprocessing del dataset act-mooc — dal livello azione al livello studente.
 
-Questo modulo impacchetta la trasformazione descritta nel Task 1
-(`01_preprocessing.ipynb`, `documentation/01_preprocessing.md`) in una funzione
-richiamabile, perché serve due volte:
+Impacchetta la trasformazione del Task 1 in una funzione richiamabile, perché serve
+due volte: in addestramento, per costruire `manuale.csv` e `training.csv`; e in sede
+d'esame, su `real_settings.csv`.
 
-1. in addestramento, per costruire `manuale.csv` e `training.csv`;
-2. in sede d'esame, sul file `real_settings.csv` fornito dal docente.
-
-Il secondo punto è la ragione per cui il modulo esiste. Le otto feature di
-`training.csv` sono definite da noi e non compaiono nel dataset originale: il
-docente non può quindi consegnare un file che le contenga già, e `real_settings.csv`
-arriverà con ogni probabilità nel formato nativo di act-mooc, cioè un log di azioni.
-`costruisci_studenti` accetta entrambi i formati e restituisce sempre la stessa
-tabella, così il percorso di preprocessing usato all'esame è identico a quello
-usato in addestramento.
+Le otto feature sono definite da noi e non compaiono nel dataset originale, quindi un
+file d'esame va trasformato prima di poterlo dare al modello. `costruisci_studenti`
+accetta sia un log di azioni sia una tabella già a livello studente, così il percorso
+di preprocessing è identico a quello usato in addestramento qualunque sia il formato
+ricevuto.
 """
 
 from pathlib import Path

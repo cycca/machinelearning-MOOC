@@ -248,7 +248,7 @@ finalisti convergono fra 0,8081 e 0,8095: **1,4 millesimi**, contro una deviazio
 
 **Due nostre ipotesi precedenti smentite dai dati** (e riportate lo stesso):
 
-- lo **scaler robusto non serve**: `RobustScaler` dà lo stesso identico punteggio di `StandardScaler`;
+- **`RobustScaler` non serve**: dà lo stesso identico punteggio di `StandardScaler`;
 - le tre feature «inerti» **contribuiscono**: toglierle peggiora tutti i modelli, per la regressione
   logistica in 5 pieghe su 5.
 
@@ -379,9 +379,10 @@ feature contengono poca informazione — tre su otto sono quasi costanti nel dat
 altre cinque sono correlate fino a 0,91. Il limite è nei dati, non nel modello.
 
 **Come applicherete il modello a `real_settings.csv`?**
-Le otto feature sono definite da noi e non esistono nel dataset originale, quindi il file arriverà
-come log di azioni. `preprocessing.py` lo trasforma con la stessa identica funzione usata in
-addestramento, e accetta anche il formato già aggregato. Testato su entrambi.
+Le otto feature sono definite da noi e non esistono nel dataset originale, quindi il file va
+trasformato prima di darlo al modello. `preprocessing.py` lo fa con la stessa identica funzione
+usata in addestramento, e accetta entrambi i formati possibili: log di azioni o tabella già
+aggregata. Testato su tutti e due.
 
 **Perché il modello non è salvato su disco?**
 L'addestramento dura meno di un secondo: rieseguire il notebook evita ogni problema di compatibilità
@@ -408,5 +409,5 @@ Dichiararli prima che li trovi il docente è la parte più importante dell'espos
    perché in combinazione contribuiscono, ma non ci si deve aspettare nulla da loro.
 4. **La finestra di osservazione è di 29,77 giorni.** `n_azioni` e `durata_giorni` dipendono da
    quella ampiezza: un file d'esame con una finestra diversa produrrebbe feature su scala diversa.
-5. **Un suggerimento del Task 3 si è rivelato sbagliato** (lo scaler robusto): l'abbiamo verificato
+5. **Un suggerimento del Task 3 si è rivelato sbagliato** (`RobustScaler`): l'abbiamo verificato
    e riportato invece di rimuoverlo.
