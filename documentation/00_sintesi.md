@@ -28,8 +28,8 @@ Project/
 | notebook | documento | contenuto |
 |---|---|---|
 | `01_preprocessing.ipynb` | `01_preprocessing.md` | dai tre TSV grezzi a `manuale.csv` e `training.csv` |
-| `02.1_naive_bayes.ipynb` | `02.1_naive_bayes.md` | primo classificatore a mano (Naive Bayes) |
-| `02.2_albero_decisione.ipynb` | `02.2_albero_decisione.md` | secondo classificatore a mano (albero ID3) |
+| `02.1_naive_bayes.ipynb` | `02.1_naive_bayes.md` | primo classificatore manuale (Naive Bayes) |
+| `02.2_decision_tree.ipynb` | `02.2_decision_tree.md` | secondo classificatore manuale (decision tree ID3) |
 | `03_analisi_esplorativa.ipynb` | `03_analisi_esplorativa.md` | data quality ed EDA |
 | `04_valutazione.ipynb` | `04_valutazione.md` | ottimizzazione dei classificatori manuali |
 | `05_modellazione.ipynb` | `05_modellazione.md` | modelli Scikit-Learn e scelta finale |
@@ -53,7 +53,7 @@ i numeri:
 > Il dataset non è tabellare, è una sequenza di eventi. Il lavoro vero è stato **cambiare l'unità di
 > analisi** — dall'azione allo studente — perché l'etichetta descrive lo studente, non l'azione.
 > Quel passaggio ha dissolto uno sbilanciamento apparente (0,99% → 57,7%) e ha reso il problema
-> trattabile. Da lì in poi, ogni modello — costruito a mano o preso da Scikit-Learn, semplice o
+> trattabile. Da lì in poi, ogni modello — nostro o preso da Scikit-Learn, semplice o
 > complesso — si ferma **intorno al 79%**, perché il limite non è nel modello ma in quanta
 > informazione le feature contengono.
 
@@ -113,21 +113,21 @@ Le 404.702 righe vengono scorse una volta sola, dentro pandas. Anche le quattro 
 
 ---
 
-## 4. Task 2 — I due classificatori costruiti a mano
+## 4. Task 2 — I due classificatori manuali
 
-*Dettaglio completo in* `02.1_naive_bayes.md`, `02.2_albero_decisione.md`
+*Dettaglio completo in* `02.1_naive_bayes.md`, `02.2_decision_tree.md`
 
 Gruppo di due componenti → due classificatori. Scelti perché **complementari** e perché sono gli
-unici del programma che si calcolano davvero a mano su dodici righe.
+unici del programma i cui calcoli si possono svolgere per intero su dodici righe.
 
-| | albero di decisione | Naive Bayes |
+| | decision tree | Naive Bayes |
 |---|---|---|
 | tipo | discriminativo | generativo |
 | feature | una alla volta | tutte insieme |
 | output | regole esplicite | probabilità |
 | ipotesi forte | separabilità a soglie | indipendenza condizionale |
 
-### 4.1 Albero (ID3, information gain)
+### 4.1 Decision tree (ID3, information gain)
 
 Feature continue → soglie sui **punti medi** fra valori consecutivi. Non discretizziamo: così è
 l'information gain a scegliere il confine, invece di sceglierlo noi.
@@ -224,8 +224,8 @@ cross-validation a 5 pieghe per il confronto finale — che serve soprattutto a 
 **deviazione standard**, pari a **0,0095**. Senza quella non si può dire se mezzo punto sia un
 miglioramento o rumore.
 
-**Albero.** Soglia da 22,5 a 28. Crescendo in profondità si guadagnano meno di 0,8 punti, ma la
-deviazione standard cresce di oltre il 60% (0,0086 → 0,0141): sovradattamento. E su **29 nodi di
+**Decision tree.** Soglia da 22,5 a 28. Crescendo in profondità si guadagnano meno di 0,8 punti, ma
+la deviazione standard cresce di oltre il 60% (0,0086 → 0,0141): overfitting. E su **29 nodi di
 decisione, 16 (55%) hanno entrambi i rami che portano alla stessa classe** — riducono entropia senza
 cambiare alcuna predizione.
 
@@ -258,7 +258,7 @@ cross-validation sul training set.
 
 ![Confronto dei classificatori](figure/ml_confronto_modelli.png)
 
-Tre modelli su otto fanno **peggio** del classificatore costruito a mano. Dopo il tuning i quattro
+Tre modelli su otto fanno **peggio** del classificatore manuale. Dopo il tuning i quattro
 finalisti convergono fra 0,8081 e 0,8095: **1,4 millesimi**, contro una deviazione standard di 0,009.
 
 **Due nostre ipotesi precedenti smentite dai dati** (e riportate lo stesso):
@@ -267,19 +267,19 @@ finalisti convergono fra 0,8081 e 0,8095: **1,4 millesimi**, contro una deviazio
 - le tre feature «inerti» **contribuiscono**: toglierle peggiora tutti i modelli, per la regressione
   logistica in 5 pieghe su 5.
 
-![Curve di apprendimento](figure/ml_curve_apprendimento.png)
+![Learning curve](figure/ml_learning_curve.png)
 
 La regressione logistica ha le curve sovrapposte (divario **+0,0007**): regime di **bias**, nessun
-sovradattamento. Ed è **piatta già da 450 campioni** — più dati non servirebbero. Il Gradient
+overfitting. Ed è **piatta già da 450 campioni** — più dati non servirebbero. Il Gradient
 Boosting parte con divario +0,0730 e arriva allo stesso punto.
 
 **Modello scelto: regressione logistica**, `C = 0,1`, `StandardScaler`.
 
-![Matrice di confusione sul test set](figure/ml_matrice_confusione.png)
+![Confusion matrix sul test set](figure/ml_confusion_matrix.png)
 
 Non è stata scelta perché vince — i quattro finalisti stanno in 0,4 punti, meno di una deviazione
-standard — ma perché a parità di prestazioni è la più semplice, non sovradatta, ha coefficienti
-leggibili ed è stabile.
+standard — ma perché a parità di prestazioni è la più semplice, non va in overfitting, ha
+coefficienti leggibili ed è stabile.
 
 **Il file d'esame.**
 
@@ -303,8 +303,8 @@ Verificato in entrambi i formati: log di azioni (200 studenti, 0,8050) e già ag
 | `manuale.csv` / `training.csv` | 12 (6+6) / 7.035 |
 | numero di feature | 8 |
 | baseline (sempre «abbandona») | 0,5771 |
-| classificatori a mano su `manuale.csv` | 1,0000 entrambi |
-| classificatori a mano su `training.csv` | albero 0,7734 — NB 0,7790 |
+| classificatori manuali su `manuale.csv` | 1,0000 entrambi |
+| classificatori manuali su `training.csv` | decision tree 0,7734 — NB 0,7790 |
 | miglior manuale dopo ottimizzazione (Task 4) | 0,7933 |
 | miglior modello sklearn in CV | 0,8095 (tutti fra 0,8081 e 0,8095) |
 | **modello finale sul test set** | **0,7925** (F1 0,8272, AUC 0,8485) |
@@ -357,8 +357,8 @@ L'unico scarto è nel Naive Bayes: sommare i logaritmi in ordine diverso cambia 
 |---|---|---|
 | NB, punteggi (2.1, 4) | due cicli annidati, classi × feature | `B @ log(P).T + (1-B) @ log(1-P).T` |
 | NB, conteggi (4) | un sottoinsieme per ogni (feature, classe, valore) | un `np.bincount` sull'indice appiattito |
-| albero, ricerca dello split (2.2, 4) | due cicli annidati, feature × soglie | una matrice `campioni × coppie candidate` |
-| albero, predizione (2.2, 4) | `X.apply(scendi, axis=1)`, un percorso per riga | discesa a maschere, ricorsione sui **nodi** |
+| decision tree, ricerca dello split (2.2, 4) | due cicli annidati, feature × soglie | una matrice `campioni × coppie candidate` |
+| decision tree, predizione (2.2, 4) | `X.apply(scendi, axis=1)`, un percorso per riga | discesa a maschere, ricorsione sui **nodi** |
 
 **I `for` che restano, e perché.**
 
@@ -402,7 +402,7 @@ otto *nomi* di colonna, perché ogni feature ha un numero diverso di soglie cand
 **Perché avete cambiato l'unità di analisi?**
 Perché `LABEL = 1` marca l'ultima azione di chi abbandona: descrive lo studente, non l'azione. A
 livello azione il problema è quasi degenere — un classificatore che risponde sempre 0 fa 99,01% di
-accuratezza, e la regola non-apprendente «è questa l'ultima azione?» fa 99,28% con richiamo 1,000.
+accuratezza, e la regola non-apprendente «è questa l'ultima azione?» fa 99,28% con recall 1,000.
 
 **Il dataset è sbilanciato: perché non avete usato SMOTE o i pesi di classe?**
 Perché non è sbilanciato. Lo 0,99% è la prevalenza nell'unità di analisi sbagliata; a livello
@@ -420,19 +420,19 @@ La consegna chiede 10–15. Sono 6 + 6 per avere entropia iniziale 1 bit. A caso
 casi più chiari» produrrebbe un file su cui qualunque classificatore funziona, rendendo la
 valutazione priva di significato.
 
-**Il vostro albero ha un solo nodo. Non è troppo poco?**
+**Il vostro decision tree ha un solo nodo. Non è troppo poco?**
 È l'algoritmo a fermarsi: `n_attivita_distinte <= 22,5` ha information gain 1,0000, entrambi i figli
-sono puri e non c'è più entropia da ridurre. Non abbiamo potato né limitato la crescita.
+sono puri e non c'è più entropia da ridurre. Non abbiamo applicato pruning né limitato la crescita.
 
 **Un IG di 1,0000 è un buon segno?**
 No, è un campanello d'allarme. Con 12 campioni e 8 feature continue è quasi sempre *possibile*
 trovare un taglio che separa tutto. Infatti sul dataset completo quello stesso albero scende al
 77,3%.
 
-**Perché avete discretizzato per il Naive Bayes ma non per l'albero?**
-Sono problemi diversi. Per l'albero le soglie sui punti medi sono l'algoritmo standard e il confine
-lo sceglie l'information gain. Per il Naive Bayes la versione gaussiana, su questi dati, ha una
-varianza degenere (0,000180) che fa dominare il prodotto a una sola feature; discretizzare alla
+**Perché avete discretizzato per il Naive Bayes ma non per il decision tree?**
+Sono problemi diversi. Per il decision tree le soglie sui punti medi sono l'algoritmo standard e il
+confine lo sceglie l'information gain. Per il Naive Bayes la versione gaussiana, su questi dati, ha
+una varianza degenere (0,000180) che fa dominare il prodotto a una sola feature; discretizzare alla
 mediana usa una regola sola, uguale per tutte, e generalizza meglio di 7,6 punti.
 
 **A cosa serve la correzione di Laplace?**
@@ -465,14 +465,14 @@ su tutto il dataset farebbe filtrare informazione dalla piega di validazione.
 **Avete scelto la regressione logistica: non è il modello meno potente?**
 Sì, ed è il punto. I quattro finalisti stanno in 0,4 punti sul test set, meno di una deviazione
 standard: non c'è un vincitore statistico. A parità di prestazioni si sceglie sul resto — nessun
-sovradattamento (divario +0,0007), un solo iperparametro, coefficienti interpretabili.
+overfitting (divario +0,0007), un solo iperparametro, coefficienti interpretabili.
 
-**Cosa vi dicono le curve di apprendimento?**
+**Cosa vi dicono le learning curve?**
 Che la regressione logistica è in regime di **bias**: curve sovrapposte, nessuna varianza. E che la
 curva di validazione è piatta già da 450 campioni, quindi più dati non aiuterebbero.
 
 **Perché nessun modello supera il 79-81%?**
-Tre indizi convergono: tutti i modelli si fermano lì; la curva di apprendimento è piatta; e le
+Tre indizi convergono: tutti i modelli si fermano lì; la learning curve è piatta; e le
 feature contengono poca informazione — tre su otto sono quasi costanti nel dataset originale, le
 altre cinque sono correlate fino a 0,91. Il limite è nei dati, non nel modello.
 

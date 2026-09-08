@@ -152,7 +152,7 @@ restano.
 `random_state=42`.
 
 **Perché 12 e bilanciati.** La consegna chiede 10–15. Il bilanciamento porta l'entropia iniziale a
-1 bit esatto, il che rende leggibili i calcoli a mano del Task 2.
+1 bit esatto, il che rende leggibili i calcoli del Task 2.
 
 **Perché a caso e non scelti.** Scegliere «i casi più chiari» produrrebbe un file su cui qualunque
 classificatore funziona, rendendo la valutazione priva di significato.
@@ -166,7 +166,7 @@ classificatore funziona, rendendo la valutazione priva di significato.
 **Perché tutti.** 7.035 righe con 8 feature sono già poche per un modello: ridurle ulteriormente
 non porterebbe alcun vantaggio.
 
-**Perché i 12 sono esclusi.** Saranno già stati usati per costruire a mano i classificatori del
+**Perché i 12 sono esclusi.** Saranno già stati usati per costruire i classificatori manuali del
 Task 2: lasciarli anche qui significherebbe valutare in parte sugli stessi dati.
 
 **Verificato.** 7.035 righe; prevalenza 57,71%, identica a quella del dataset completo.
@@ -197,8 +197,8 @@ storia.
 tabella studente) e `carica_per_predire` (legge un file e restituisce `X, y`).
 
 **Perché.** Le 8 feature sono definite da noi e non esistono nel dataset originale, quindi
-`real_settings.csv` va trasformato prima di darlo al modello. Rifacendo la trasformazione a mano,
-ogni minima differenza rispetto all'addestramento cambierebbe i risultati senza che ce ne
+`real_settings.csv` va trasformato prima di darlo al modello. Rifacendo la trasformazione fuori dal
+modulo, ogni minima differenza rispetto all'addestramento cambierebbe i risultati senza che ce ne
 accorgiamo. Il modulo garantisce che sia la stessa.
 
 `costruisci_studenti` accetta tre formati:

@@ -8,7 +8,7 @@ verificano.
 | [00_sintesi.md](00_sintesi.md) | tutti | guida allo studio: filo conduttore, numeri chiave, domande d'orale |
 | [01_preprocessing.md](01_preprocessing.md) | 1 | dal livello azione al livello studente, le 8 feature, i due CSV |
 | [02.1_naive_bayes.md](02.1_naive_bayes.md) | 2 | primo classificatore manuale |
-| [02.2_albero_decisione.md](02.2_albero_decisione.md) | 2 | secondo classificatore manuale |
+| [02.2_decision_tree.md](02.2_decision_tree.md) | 2 | secondo classificatore manuale |
 | [03_analisi_esplorativa.md](03_analisi_esplorativa.md) | 3 | controlli di qualità, distribuzioni, correlazioni |
 | [04_valutazione.md](04_valutazione.md) | 4 | ottimizzazione dei classificatori manuali |
 | [05_modellazione.md](05_modellazione.md) | 5 | modelli Scikit-Learn e classificatore finale |

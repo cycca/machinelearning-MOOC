@@ -21,10 +21,10 @@ restituisce il massimo di un insieme di rumore, non una stima delle prestazioni.
 | riferimento | accuratezza |
 |---|---|
 | baseline: rispondere sempre «abbandona» | 0,5771 |
-| miglior classificatore **costruito a mano** (Task 4) | 0,7933 |
+| miglior classificatore **manuale** (Task 4) | 0,7933 |
 
-Il secondo è il più interessante: dice quanto valga usare Scikit-Learn invece di venti righe scritte
-a mano.
+Il secondo è il più interessante: dice quanto valga usare Scikit-Learn invece delle venti righe del
+Task 2.
 
 ---
 
@@ -46,12 +46,12 @@ sole pieghe di addestramento — la regola 2 del progetto.
 | Naive Bayes gaussiano | 0,7944 | 0,0086 | 0,8232 | 0,8610 |
 | k-NN (k=5) | 0,7839 | 0,0073 | 0,8173 | 0,8310 |
 | Perceptron | 0,7228 | 0,0683 | 0,7691 | 0,7763 |
-| Albero di decisione | 0,7178 | 0,0191 | 0,7537 | 0,7108 |
+| Decision tree | 0,7178 | 0,0191 | 0,7537 | 0,7108 |
 
-**Tre letture.** L'**albero senza limiti di profondità** è il peggiore: cresce fino a foglie pure e
-impara il rumore. Il **Perceptron** ha una deviazione standard dieci volte quella degli altri: i dati
-non sono linearmente separabili. E **tre modelli su otto fanno peggio del classificatore costruito a
-mano**, un quarto lo eguaglia.
+**Tre letture.** Il **decision tree senza limiti di profondità** è il peggiore: cresce fino a foglie
+pure e impara il rumore. Il **Perceptron** ha una deviazione standard dieci volte quella degli
+altri: i dati non sono linearmente separabili. E **tre modelli su otto fanno peggio del
+classificatore manuale**, un quarto lo eguaglia.
 
 ---
 
@@ -120,7 +120,7 @@ si stabilizzano misura il bias.
 
 | modello | divario finale | regime |
 |---|---|---|
-| Regressione logistica | **+0,0007** | bias: nessun sovradattamento |
+| Regressione logistica | **+0,0007** | bias: nessun overfitting |
 | Gradient Boosting | +0,0242 | varianza: memorizza, poi recupera con più dati |
 
 **Il dettaglio decisivo.** La curva di validazione della regressione logistica è **piatta già da 450
@@ -148,12 +148,12 @@ altri criteri:
 | criterio | perché |
 |---|---|
 | prestazioni | la migliore sul test set, seppure di poco |
-| assenza di sovradattamento | curve di apprendimento sovrapposte (+0,0007) |
+| assenza di overfitting | learning curve sovrapposte (+0,0007) |
 | semplicità | un iperparametro contro i quattro del boosting |
 | interpretabilità | coefficienti leggibili |
 | stabilità | nessuna dipendenza da seed o algoritmi complessi |
 
-**Prestazioni dettagliate.** Precisione 0,7961 e richiamo 0,8608 sugli abbandoni; 0,7864 e 0,6992 su
+**Prestazioni dettagliate.** Precision 0,7961 e recall 0,8608 sugli abbandoni; 0,7864 e 0,6992 su
 chi prosegue. Il modello sbaglia più spesso classificando come abbandono chi prosegue (179 casi) che
 il contrario (113).
 
@@ -171,7 +171,7 @@ il contrario (113).
 | `feature2_media` | +0,038 |
 
 Le prime cinque hanno segno **negativo**: più attività, giorni, azioni e durata, meno probabilità di
-abbandono. È la stessa relazione trovata a mano nel Task 2.
+abbandono. È la stessa relazione trovata nel Task 2.
 
 **Con l'avvertimento del Task 3.** Con correlazioni fino a 0,91 i coefficienti **non sono
 interpretabili singolarmente**: che `n_attivita_distinte` pesi −0,645 e `n_azioni` −0,312 non
@@ -217,14 +217,14 @@ notebook evita ogni problema di compatibilità fra versioni di Scikit-Learn.
 
 ## 9. Conclusioni
 
-**Quanto è servito Scikit-Learn.** Il miglior classificatore costruito a mano arrivava a 0,7933 in
+**Quanto è servito Scikit-Learn.** Il miglior classificatore manuale arrivava a 0,7933 in
 cross-validation, contro 0,8081 del modello finale: **+1,5 punti**, circa una deviazione standard e
 mezza. Un guadagno reale ma piccolo, e dirlo è più onesto che presentarlo come una svolta.
 
 **Perché il tetto è dove è.** Tre indizi indipendenti convergono:
 
 1. tutti i modelli, dal confine lineare al boosting, si fermano a 0,809;
-2. la curva di apprendimento è piatta già da 450 campioni;
+2. la learning curve è piatta già da 450 campioni;
 3. tre feature su otto sono quasi costanti nel dataset **originale** (`FEATURE3` ha lo stesso valore
    nel 93,5% delle azioni) e le altre cinque sono correlate fino a 0,91.
 

@@ -12,7 +12,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-DOCUMENTI=(00_sintesi.md 01_preprocessing.md 02.1_naive_bayes.md 02.2_albero_decisione.md
+DOCUMENTI=(00_sintesi.md 01_preprocessing.md 02.1_naive_bayes.md 02.2_decision_tree.md
            03_analisi_esplorativa.md 04_valutazione.md 05_modellazione.md)
 USCITA=${1:-../../progetto_ML_2026.pdf}
 

@@ -158,8 +158,8 @@ rettilinea.
    della definizione di «giorno di calendario».
 2. **Nessuna riga va rimossa**: duplicati e valori estremi sono entrambi legittimi.
 3. **Collinearità fino a 0,91**: i coefficienti di un modello lineare non saranno interpretabili
-   singolarmente. Spiega anche il risultato del Task 2, dove albero (una feature) e Naive Bayes
-   (otto) ottengono quasi lo stesso punteggio.
+   singolarmente. Spiega anche il risultato del Task 2, dove decision tree (una feature) e Naive
+   Bayes (otto) ottengono quasi lo stesso punteggio.
 4. **Tre feature su otto sono rumore**, per un difetto del dataset originale. Le teniamo — scartarle
    guardando questi dati sarebbe una scelta presa sul test.
 5. **Distribuzioni asimmetriche**: conviene confrontare `StandardScaler` con uno scaler resistente

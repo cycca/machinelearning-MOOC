@@ -1,6 +1,6 @@
 # Task 4 — Valutazione e ottimizzazione dei classificatori manuali
 
-**Obiettivo.** Valutare su `training.csv` i due classificatori costruiti a mano nel Task 2 e cercare
+**Obiettivo.** Valutare su `training.csv` i due classificatori manuali del Task 2 e cercare
 di ottimizzarne le prestazioni.
 
 **Risultato.** L'ottimizzazione porta l'accuratezza da **0,7734 a 0,7933** (+2,0 punti, vinti in
@@ -39,24 +39,24 @@ scende l'albero a maschere invece che riga per riga. Serve, perché questo noteb
 alberi: **67,7 secondi con i cicli, 6,6 vettorizzato**, con output identici al carattere. Dettagli
 nella sezione 9 di [00_sintesi.md](00_sintesi.md).
 
-**Verificato.** Le funzioni riscritte nel notebook riproducono il Task 2 esattamente: l'albero
-ritrova `n_attivita_distinte <= 22,5` e fa 1,0000 su `manuale.csv`, il Naive Bayes fa 1,0000.
+**Verificato.** Le funzioni riscritte nel notebook riproducono il Task 2 esattamente: il decision
+tree ritrova `n_attivita_distinte <= 22,5` e fa 1,0000 su `manuale.csv`, il Naive Bayes fa 1,0000.
 
 | classificatore del Task 2 | accuratezza (CV) | dev.std | F1 |
 |---|---|---|---|
 | Naive Bayes (soglie di `manuale.csv`) | 0,7902 | 0,0075 | 0,8184 |
-| albero (soglia 22,5) | 0,7734 | 0,0088 | 0,8031 |
+| decision tree (soglia 22,5) | 0,7734 | 0,0088 | 0,8031 |
 
 **Un dettaglio che spiega una differenza fra documenti.** Nel Task 2.1 il Naive Bayes otteneva
 **0,7790**, qui ottiene **0,7902**. Sono due protocolli diversi: nel Task 2 *tutto* il modello —
 priori e condizionate — era stimato sui dodici campioni; qui dai dodici campioni vengono solo le
 **soglie di discretizzazione**, mentre le condizionate sono ristimate sulle pieghe di addestramento,
-che è il modo corretto di valutarlo in cross-validation. L'albero invece dà lo stesso 0,7734 in
-entrambi i documenti, perché la sua regola è completamente fissata dalla soglia.
+che è il modo corretto di valutarlo in cross-validation. Il decision tree invece dà lo stesso 0,7734
+in entrambi i documenti, perché la sua regola è completamente fissata dalla soglia.
 
 ---
 
-## 3. Ottimizzazione dell'albero
+## 3. Ottimizzazione del decision tree
 
 ### 3.1 La soglia
 
@@ -97,7 +97,7 @@ fra 0,56 e 0,61.
 | 5 | **0,7906** | **0,0141** | 0,8228 |
 
 **Il guadagno c'è ma metà dell'albero non serve.** Da profondità 1 a 5 si guadagnano meno di 0,8
-punti, mentre la deviazione standard cresce di oltre il 60% (0,0086 → 0,0141): sovradattamento.
+punti, mentre la deviazione standard cresce di oltre il 60% (0,0086 → 0,0141): overfitting.
 
 Il conteggio dei nodi spiega perché: nell'albero di profondità 5 ci sono 29 nodi di decisione, e in
 **16 di essi (55%) entrambi i rami portano alla stessa classe**. Riducono entropia ma non cambiano
@@ -147,11 +147,11 @@ ma che rappresenti equamente le due classi.
 | configurazione | accuratezza (CV) | dev.std | scarto dal migliore |
 |---|---|---|---|
 | Naive Bayes, soglie dalle medie di classe | **0,7933** | 0,0080 | — |
-| albero ricresciuto sui dati, profondità 5 | 0,7906 | 0,0141 | 0,0027 |
+| decision tree ricresciuto, profondità 5 | 0,7906 | 0,0141 | 0,0027 |
 | Naive Bayes del Task 2 | 0,7902 | 0,0075 | 0,0031 |
-| albero ricresciuto sui dati, profondità 4 | 0,7893 | 0,0095 | 0,0040 |
+| decision tree ricresciuto, profondità 4 | 0,7893 | 0,0095 | 0,0040 |
 | Naive Bayes, 4 intervalli sui quantili | 0,7822 | 0,0088 | 0,0111 |
-| albero del Task 2 | 0,7734 | 0,0088 | 0,0199 |
+| decision tree del Task 2 | 0,7734 | 0,0088 | 0,0199 |
 
 Baseline «rispondi sempre abbandono»: 0,5771.
 
@@ -168,8 +168,8 @@ deviazione standard tipica di 0,0095 valgono poco più di due deviazioni standar
 misurano in larga parte la stessa cosa.
 
 **I due modelli restano equivalenti.** Le prime quattro righe della tabella finale stanno in 0,4
-punti, meno di mezza deviazione standard. Coerente con il Task 2: l'albero usa una feature, il Naive
-Bayes otto, ma quelle otto ripetono la stessa informazione.
+punti, meno di mezza deviazione standard. Coerente con il Task 2: il decision tree usa una feature,
+il Naive Bayes otto, ma quelle otto ripetono la stessa informazione.
 
 **La lezione metodologica.** Il caso delle soglie è il risultato più utile: la configurazione che
 sembrava fortunata era corretta per una ragione precisa — il bilanciamento — e ce ne siamo accorti
@@ -186,9 +186,9 @@ protocollo invece resta questo.
 |---|---|
 | protocollo | 70/30 per la ricerca, 5-fold CV per il confronto |
 | controprova sulle funzioni | riproducono il Task 2 esattamente |
-| albero, soglia | 22,5 → 28 |
-| albero, profondità | guadagno < 0,8 punti, dev.std da 0,0086 a 0,0141 |
-| albero, nodi inutili | 16 su 29 (55%) |
+| decision tree, soglia | 22,5 → 28 |
+| decision tree, profondità | guadagno < 0,8 punti, dev.std da 0,0086 a 0,0141 |
+| decision tree, nodi inutili | 16 su 29 (55%) |
 | Naive Bayes, intervalli | 4 è il massimo utile (0,7822) |
 | Naive Bayes, soglie | conta il bilanciamento del campione, non la numerosità |
 | migliore configurazione | Naive Bayes con soglie dalle medie di classe, 0,7933 |
