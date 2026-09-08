@@ -89,14 +89,18 @@ def costruisci_studenti(df, verbose=False):
         print(f"attenzione: {persi} studenti con una sola azione restano senza feature "
               "e non compaiono nel risultato")
 
+    # Un'unica passata per gruppo: le quattro medie escono da una sola aggregazione su tutte
+    # e quattro le colonne insieme, non da un giro di ciclo per colonna.
     gruppi = storia.assign(GIORNO=storia["TIMESTAMP"] // SECONDI_IN_UN_GIORNO).groupby("USERID")
-    studenti = pd.DataFrame({
-        "n_azioni": gruppi.size(),
-        "n_attivita_distinte": gruppi["TARGETID"].nunique(),
-        "n_giorni_attivi": gruppi["GIORNO"].nunique(),
-        "durata_giorni": (gruppi["TIMESTAMP"].max() - gruppi["TIMESTAMP"].min()) / SECONDI_IN_UN_GIORNO,
-        **{c.lower() + "_media": gruppi[c].mean() for c in COLONNE_FEATURE},
-    })
+    studenti = pd.concat([
+        pd.DataFrame({
+            "n_azioni": gruppi.size(),
+            "n_attivita_distinte": gruppi["TARGETID"].nunique(),
+            "n_giorni_attivi": gruppi["GIORNO"].nunique(),
+            "durata_giorni": (gruppi["TIMESTAMP"].max() - gruppi["TIMESTAMP"].min()) / SECONDI_IN_UN_GIORNO,
+        }),
+        gruppi[COLONNE_FEATURE].mean().rename(columns=lambda c: c.lower() + "_media"),
+    ], axis=1)
 
     if "LABEL" in dati.columns:                       # file etichettato: aggiungiamo il target
         studenti["ABBANDONO"] = dati.groupby("USERID")["LABEL"].max()

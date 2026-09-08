@@ -10,7 +10,7 @@ piattaforma MOOC, in circa 30 giorni.
 sul test set, F1 0,8272, ROC-AUC 0,8485. Baseline: 57,71%.
 
 Questo documento serve a **studiare il progetto**, non a sostituire i cinque documenti di dettaglio:
-ogni sezione rimanda al file corrispondente. La sezione 9 raccoglie le domande più probabili
+ogni sezione rimanda al file corrispondente. La sezione 10 raccoglie le domande più probabili
 all'orale con la risposta.
 
 ---
@@ -94,14 +94,19 @@ storia = dati.drop(index=dati.groupby("USERID").tail(1).index)
 
 ```python
 gruppi = storia.assign(GIORNO=storia["TIMESTAMP"] // 86400).groupby("USERID")
-studenti = pd.DataFrame({
-    "n_azioni":            gruppi.size(),
-    "n_attivita_distinte": gruppi["TARGETID"].nunique(),
-    "n_giorni_attivi":     gruppi["GIORNO"].nunique(),
-    "durata_giorni":       (gruppi["TIMESTAMP"].max() - gruppi["TIMESTAMP"].min()) / 86400,
-    **{c.lower() + "_media": gruppi[c].mean() for c in COLONNE_FEATURE},
-})
+studenti = pd.concat([
+    pd.DataFrame({
+        "n_azioni":            gruppi.size(),
+        "n_attivita_distinte": gruppi["TARGETID"].nunique(),
+        "n_giorni_attivi":     gruppi["GIORNO"].nunique(),
+        "durata_giorni":       (gruppi["TIMESTAMP"].max() - gruppi["TIMESTAMP"].min()) / 86400,
+    }),
+    gruppi[COLONNE_FEATURE].mean().rename(columns=lambda c: c.lower() + "_media"),
+], axis=1)
 ```
+
+Le 404.702 righe vengono scorse una volta sola, dentro pandas. Anche le quattro medie escono da
+**una** aggregazione su tutte e quattro le colonne insieme, non da quattro giri di ciclo.
 
 **I due file prodotti.** `manuale.csv` (12 studenti, 6 + 6, estratti a caso con `random_state=42`) e
 `training.csv` (i restanti 7.035).
@@ -128,15 +133,23 @@ Feature continue → soglie sui **punti medi** fra valori consecutivi. Non discr
 l'information gain a scegliere il confine, invece di sceglierlo noi.
 
 ```python
-def entropia(v):
-    p = v.value_counts(normalize=True).to_numpy()
-    return float(-(p * np.log2(p)).sum()) + 0.0
+def entropia_binaria(positivi, totali):        # scritta sui CONTEGGI, non sulle etichette
+    p = np.divide(positivi, totali, out=np.zeros_like(totali, float), where=totali > 0)
+    q = 1 - p
+    return -(np.where(p > 0, p * np.log2(p), 0) + np.where(q > 0, q * np.log2(q), 0)) + 0.0
 
-def guadagno(X, y, feature, soglia):
-    s, d = y[X[feature] <= soglia], y[X[feature] > soglia]
-    peso = len(s) / len(y)
-    return entropia(y) - peso * entropia(s) - (1 - peso) * entropia(d)
+def guadagno(a_sinistra, y):                   # a_sinistra: (campioni x split candidati)
+    positivi, n = (y.to_numpy() == 1)[:, None], len(y)
+    n_sx, pos_sx = a_sinistra.sum(axis=0), (a_sinistra & positivi).sum(axis=0)
+    return (entropia(y) - (n_sx / n)       * entropia_binaria(pos_sx, n_sx)
+                        - ((n - n_sx) / n) * entropia_binaria(positivi.sum() - pos_sx, n - n_sx))
 ```
+
+**Perché è scritta così.** `entropia_binaria` prende i *conteggi* invece del vettore di etichette,
+e diventa un'espressione di soli operatori aritmetici: NumPy la applica elemento per elemento,
+quindi la stessa riga vale per un nodo o per trecento split in parallelo. `a_sinistra` ha una riga
+per campione e una colonna per split candidato, così tutte le coppie (feature, soglia) del nodo si
+valutano in una passata. Vedi la sezione 9.
 
 **Risultato.** `n_attivita_distinte <= 22,5` ottiene **IG = 1,0000**, il massimo: separa i 12
 campioni senza errori. L'albero è **un solo nodo**. Accuratezza 1,0000 su `manuale.csv`, 0,7734 su
@@ -301,7 +314,90 @@ Verificato in entrambi i formati: log di azioni (200 studenti, 0,8050) e già ag
 
 ---
 
-## 9. Domande probabili all'orale
+## 9. Come è scritto il codice — la vettorizzazione
+
+**Cosa.** Nessun calcolo che tocchi i dati è scritto con un ciclo Python. Righe, colonne e soglie
+candidate si attraversano con operazioni su array: confronti, maschere booleane, somme di colonna,
+prodotti matriciali, `groupby`. I `for` che restano nei notebook non scorrono dati.
+
+**Perché.** Tre motivi, in ordine di importanza.
+
+1. **È la formula, scritta come si scrive.** Il Naive Bayes somma i logaritmi delle condizionate su
+   tutte le feature: quella somma *è* un prodotto matriciale, e scriverla come `B @ log(P).T`
+   avvicina il codice alla matematica invece di allontanarlo. Lo stesso vale per l'entropia: scritta
+   sui conteggi diventa un'espressione aritmetica che vale per un nodo o per mille.
+2. **Il ciclo non è dove si guarda quando si cerca un errore.** Un doppio ciclo su feature e soglie
+   nasconde la logica dentro l'impalcatura che la fa girare. La versione vettorizzata dice in tre
+   righe *cosa* si sta calcolando.
+3. **La velocità, che cambia il modo di lavorare.** Il ciclo Python interpreta ogni singola
+   operazione; NumPy e pandas la eseguono in C su un blocco contiguo di memoria. Non è comodità:
+   un Task 4 che gira in 6 secondi invece di 68 lo si rilancia ogni volta che serve ricontrollare
+   un numero, mentre uno lento spinge a fidarsi degli output già salvati — cioè al modo di
+   lavorare sbagliato. E l'abitudine si prende **qui**, su 7.035 righe, dove costa poco, non sul
+   dataset in cui il ciclo non finirebbe più: la dimensione di questo dataset è didattica, non un
+   argomento per scrivere il codice peggio.
+
+**Verificato.** Il Task 4 fa crescere 25 alberi (5 profondità × 5 pieghe), e ogni nodo valuta ~320
+coppie (feature, soglia):
+
+| | con i cicli | vettorizzato |
+|---|---|---|
+| `04_valutazione.ipynb`, notebook intero | 67,7 s | **6,6 s** |
+| un albero di profondità 5 su 4.924 studenti | 4,7 s | **0,09 s** |
+
+**Gli output non cambiano.** Le due versioni sono state confrontate riga per riga sugli stessi dati:
+strutture degli alberi identiche, stesse predizioni su tutti i 7.035 studenti, scansioni di soglia
+identiche **bit per bit**. Il Task 4 e il Task 5 producono output testuali identici al carattere.
+L'unico scarto è nel Naive Bayes: sommare i logaritmi in ordine diverso cambia il risultato di
+2 ulp (~3·10⁻¹⁵), cioè la sedicesima cifra decimale, senza toccare nessuna predizione.
+
+**Le quattro trasformazioni principali.**
+
+| dove | prima | dopo |
+|---|---|---|
+| NB, punteggi (2.1, 4) | due cicli annidati, classi × feature | `B @ log(P).T + (1-B) @ log(1-P).T` |
+| NB, conteggi (4) | un sottoinsieme per ogni (feature, classe, valore) | un `np.bincount` sull'indice appiattito |
+| albero, ricerca dello split (2.2, 4) | due cicli annidati, feature × soglie | una matrice `campioni × coppie candidate` |
+| albero, predizione (2.2, 4) | `X.apply(scendi, axis=1)`, un percorso per riga | discesa a maschere, ricorsione sui **nodi** |
+
+**I `for` che restano, e perché.**
+
+| tipo | dove | perché non si vettorizza |
+|---|---|---|
+| pieghe di cross-validation | `cv_punteggi` (Task 4) | ogni piega **riaddestra** il modello |
+| modelli e iperparametri | Task 5, quasi ovunque | ogni giro chiama `fit` su uno stimatore diverso |
+| nomi di colonna | `classifica_feature`, `nb_quantili` | ogni feature ha un numero **diverso** di soglie, le liste non stanno in un unico array; il corpo del ciclo è già un'operazione su tutta la colonna |
+| assi di un grafico | Task 3 e 5 | ogni giro disegna un oggetto matplotlib diverso |
+| stampa di un riepilogo | qua e là | il calcolo è già fatto, resta solo da formattarlo |
+
+La distinzione da tenere all'orale è questa: **si vettorizza ciò che ripete la stessa operazione su
+dati diversi; non si vettorizza ciò che fa operazioni diverse.** Un ciclo su otto nomi di colonna in
+cui ogni giro elabora 7.035 righe in blocco non è un ciclo sui dati.
+
+---
+
+## 10. Domande probabili all'orale
+
+**Nel vostro codice non ci sono cicli sui dati: perché?**
+Perché la formula si scrive meglio così. La somma dei logaritmi del Naive Bayes su tutte le feature
+*è* un prodotto matriciale, e `B @ log(P).T` la dice più chiaramente di due cicli annidati.
+L'entropia scritta sui conteggi invece che sulle etichette diventa un'espressione aritmetica che
+NumPy applica a un nodo o a trecento split indifferentemente. La velocità viene dietro: il Task 4 è
+passato da 67,7 a 6,6 secondi. Le due versioni sono state confrontate riga per riga e danno gli
+stessi risultati — dettaglio nella sezione 9.
+
+**Allora perché nel Task 5 ci sono ancora dei `for`?**
+Perché lì ogni giro fa una cosa **diversa**: chiama `fit` su un modello diverso, o su una piega
+diversa della cross-validation. Vettorizzare vuol dire applicare la *stessa* operazione a molti
+dati in un colpo solo; dove l'operazione cambia a ogni giro non c'è niente da vettorizzare. La
+regola che abbiamo seguito è: nessun ciclo Python che scorra righe, colonne o soglie candidate.
+
+**Come fate a valutare tutte le soglie di un nodo senza un ciclo?**
+Si impilano in un unico vettore tutte le coppie (feature, soglia) candidate e si costruisce la
+matrice booleana `campioni × coppie`, dove la colonna *j* dice quali campioni finiscono nel ramo
+sinistro dello split *j*. Da lì i conteggi delle due classi in ogni ramo sono due somme di colonna,
+e l'information gain di tutti gli split esce da un'unica espressione. Il ciclo che resta scorre gli
+otto *nomi* di colonna, perché ogni feature ha un numero diverso di soglie candidate.
 
 **Perché avete cambiato l'unità di analisi?**
 Perché `LABEL = 1` marca l'ultima azione di chi abbandona: descrive lo studente, non l'azione. A
@@ -398,7 +494,7 @@ previsione dell'abbandono a corso in corso.
 
 ---
 
-## 10. I limiti che dichiariamo per primi
+## 11. I limiti che dichiariamo per primi
 
 Dichiararli prima che li trovi il docente è la parte più importante dell'esposizione.
 

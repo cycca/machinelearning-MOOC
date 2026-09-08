@@ -36,6 +36,11 @@ Dove una scelta ne escludeva altre, c'è **Alternative scartate** con una riga p
    estremo esiste solo a livello azione, cioè nell'unità di analisi sbagliata.
 4. **Il file d'esame passa da `preprocessing.costruisci_studenti`**, perché le 8 feature non
    esistono nel dataset originale.
+5. **Nessun ciclo Python sui dati.** Ogni calcolo che tocca righe, colonne o soglie candidate è
+   scritto come operazione su array o su `DataFrame`. I `for` rimasti scorrono modelli, pieghe di
+   cross-validation, iperparametri o assi di un grafico — cose che non si possono vettorizzare
+   perché ogni giro fa una cosa diversa. La motivazione è nella sezione 9 di
+   [00_sintesi.md](00_sintesi.md).
 
 ## Produrre il PDF
 

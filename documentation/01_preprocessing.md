@@ -121,6 +121,12 @@ povero con 4 azioni.
 
 Valori arrotondati a 3 decimali.
 
+**Come sono calcolate.** Un solo `groupby("USERID")` sulle 404.702 righe della storia, e otto
+aggregazioni su quel raggruppamento. Le quattro medie escono da **una** chiamata su tutte e quattro
+le colonne insieme (`gruppi[COLONNE_FEATURE].mean()`), non da un giro di ciclo per colonna: pandas
+attraversa i dati una volta sola, in C. Vale identico in `preprocessing.py`, che è lo stesso codice
+impacchettato in una funzione.
+
 **Perché queste.** Le prime quattro rispondono alle domande naturali su uno studente — quanto,
 quanto a lungo, quanto spesso, quanto in ampiezza — e restano leggibili in un grafico e in un
 albero. Le ultime quattro sono l'unica informazione descrittiva dell'azione presente nel dataset.

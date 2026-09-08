@@ -39,6 +39,19 @@ esecuzione.
 (`../data/...`). Se li lanci da altrove, quei percorsi non si risolvono. `preprocessing.py` invece
 risolve il percorso rispetto al file del modulo, quindi funziona da qualunque directory.
 
+## Come è scritto il codice
+
+**Nessun ciclo Python sui dati.** Ogni calcolo che tocca righe, colonne o soglie candidate è
+un'operazione su array o su `DataFrame`: il Naive Bayes somma i logaritmi con un prodotto
+matriciale, la ricerca dello split valuta tutte le coppie (feature, soglia) in un'unica matrice,
+l'albero predice scendendo a maschere invece che riga per riga. I `for` rimasti scorrono modelli,
+pieghe di cross-validation, iperparametri o assi di un grafico — dove ogni giro fa un'operazione
+diversa e non c'è niente da vettorizzare.
+
+Il Task 4 passa così da **67,7 a 6,6 secondi**, a parità di risultati: le due versioni sono state
+confrontate riga per riga e i notebook 04 e 05 producono output identici al carattere. Motivazione
+estesa nella sezione 9 di `documentation/00_sintesi.md`.
+
 ## Usare il modello sul file d'esame
 
 Le 8 feature sono definite da noi e non esistono nel dataset originale, quindi `real_settings.csv`
