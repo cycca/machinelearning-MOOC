@@ -64,6 +64,11 @@ dati["LABEL"] = etichette["LABEL"].to_numpy()
 studente. Aggregando per `USERID` si passa da 411.749 righe a 7.047, e la prevalenza sale da 0,99%
 a 57,7%.
 
+A 57,7% le classi sono quasi bilanciate, quindi **nessun ribilanciamento**: né SMOTE né pesi di
+classe: lo sbilanciamento estremo esisteva solo nell'unità di analisi sbagliata. `USERID` resta
+l'indice e non è mai una feature — è un identificativo, e darlo a un modello significa invitarlo a
+memorizzare.
+
 ### c. Esclusione dell'ultima azione di *ogni* studente
 
 Non solo di chi abbandona. Se la togliessimo ai soli positivi, la regola di costruzione delle
@@ -96,7 +101,8 @@ escono da una singola aggregazione su tutte le colonne insieme, non da quattro g
 
 *Notebook* `02.1_naive_bayes.ipynb`, `02.2_decision_tree.ipynb`
 
-Gruppo di due componenti, due classificatori. Scelti perché **complementari**, e perché sono gli
+La consegna chiede «uno o due classificatori a seconda del numero di componenti»: gruppo di due,
+quindi due. Scelti perché **complementari**, e perché sono gli
 unici del programma i cui calcoli si possono svolgere per intero su dodici righe — cioè
 verificabili a mano.
 
@@ -255,6 +261,10 @@ misurata.
 Divisione 80/20 stratificata, con il test set **messo da parte subito** e non toccato fino alla
 scelta finale. Ogni decisione — modelli, scaler, feature, iperparametri, soglia — è presa in
 cross-validation sul solo training set.
+
+Lo scaling sta **dentro una `Pipeline`**, non applicato prima: così media e deviazione standard
+sono stimate solo sulle pieghe di addestramento. Stimarle sull'intero dataset farebbe filtrare
+informazione dalla piega di validazione — un leakage sottile, che non dà errore e alza i punteggi.
 
 In gara i **cinque modelli visti a lezione**, con parametri di default, per avere un punto di
 partenza non influenzato dalle nostre scelte. Coprono quattro famiglie: lineare (regressione

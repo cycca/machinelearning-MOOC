@@ -14,9 +14,14 @@ una baseline del 57,71%.
 
 ```
 data/            manuale.csv (12 studenti), training.csv (7.035), act-mooc/ (grezzi, non versionati)
-notebooks/       i sei notebook, in ordine, + preprocessing.py
-documentation/   la relazione per l'orale, i sette .md di motivazioni e le figure
+notebooks/       i sei notebook, in ordine, + preprocessing.py e predici.py
+documentation/   relazione.md, un .md di motivazioni per task, le figure
 ```
+
+`documentation/relazione.md` è la relazione del progetto. Accanto, un documento per task con le
+motivazioni estese e le alternative scartate, da `01_preprocessing.md` a `05_modellazione.md` — il
+Task 2 è diviso in due perché il gruppo è di due componenti. `00_2kno.md` sono appunti privati di
+preparazione all'orale e non fa parte della consegna.
 
 ## Far girare il progetto
 
@@ -57,15 +62,23 @@ estesa in `documentation/relazione.md`, sezione «Come è scritto il codice».
 Le 8 feature sono definite da noi e non esistono nel dataset originale, quindi `real_settings.csv`
 va trasformato prima di darlo al modello.
 
-```python
-import preprocessing as pp
-X, y = pp.carica_per_predire("real_settings.csv")   # log di azioni o tabella già aggregata
-previsioni = finale.predict(X)                      # `finale` viene da 05_modellazione.ipynb
+Copia il file in `data/real_settings.csv` e scegli una delle due strade.
+
+**Dal notebook.** Apri `05_modellazione.ipynb` ed esegui tutte le celle: l'ultima cella di codice
+della sezione 8 rileva il file, lo trasforma, predice e salva `data/previsioni.csv`. Se il file non
+c'è, quella cella stampa un avviso e non fa altro.
+
+**Da terminale**, senza aprire niente:
+
+```bash
+cd notebooks
+python predici.py ../data/real_settings.csv
 ```
 
-`carica_per_predire` accetta entrambi i formati e restituisce `y = None` se manca la colonna delle
-etichette. Il modello non è salvato su disco: si riottiene eseguendo `05_modellazione.ipynb`, meno
-di un minuto.
+Entrambe le strade passano per `preprocessing.carica_per_predire`, che accetta log di azioni o
+tabella già a livello studente, con o senza etichette: se le etichette ci sono stampa anche
+l'accuratezza, altrimenti solo le previsioni. Il modello non è salvato su disco — si riaddestra in
+un secondo, e sullo stesso seme dà previsioni identiche nei due percorsi.
 
 ## Limiti dichiarati
 

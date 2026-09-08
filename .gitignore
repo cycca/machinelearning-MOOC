@@ -8,3 +8,7 @@ __pycache__/
 data/act-mooc/
 data/act-mooc.tar.gz
 data/._act-mooc
+
+# file d'esame e output delle previsioni
+data/real_settings.csv
+data/previsioni.csv
