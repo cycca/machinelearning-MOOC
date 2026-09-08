@@ -37,7 +37,7 @@ la ricerca dello split valuta tutte le ~320 coppie (feature, soglia) del nodo in
 `campioni × coppie`, i conteggi del Naive Bayes escono da un solo `np.bincount`, e la predizione
 scende l'albero a maschere invece che riga per riga. Serve, perché questo notebook fa crescere 25
 alberi: **67,7 secondi con i cicli, 6,6 vettorizzato**, con output identici al carattere. Dettagli
-nella sezione 9 di [00_sintesi.md](00_sintesi.md).
+in «Come è scritto il codice» di [relazione.md](relazione.md).
 
 **Verificato.** Le funzioni riscritte nel notebook riproducono il Task 2 esattamente: il decision
 tree ritrova `n_attivita_distinte <= 22,5` e fa 1,0000 su `manuale.csv`, il Naive Bayes fa 1,0000.

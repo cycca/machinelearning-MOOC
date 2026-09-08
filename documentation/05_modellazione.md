@@ -30,8 +30,8 @@ Task 2.
 
 ## 2. I classificatori in gara
 
-Otto modelli visti a lezione, con **parametri di default**, per avere un punto di partenza non
-influenzato dalle nostre scelte.
+I **cinque modelli visti a lezione**, con **parametri di default**, per avere un punto di partenza
+non influenzato dalle nostre scelte. Il k-NN parte dal k predefinito di Scikit-Learn, 5.
 
 **Lo scaling dentro una `Pipeline`.** I modelli basati su distanze o gradienti lo richiedono, quelli
 ad albero no. Metterlo nella pipeline garantisce che media e deviazione standard siano stimate sulle
@@ -40,18 +40,17 @@ sole pieghe di addestramento — la regola 2 del progetto.
 | modello | accuratezza | dev.std | F1 | ROC-AUC |
 |---|---|---|---|---|
 | Regressione logistica | **0,8074** | 0,0095 | 0,8389 | 0,8683 |
-| SVC (RBF) | 0,8072 | 0,0065 | 0,8401 | 0,8416 |
-| Gradient Boosting | 0,8017 | 0,0056 | 0,8333 | 0,8585 |
-| Random Forest | 0,7998 | 0,0093 | 0,8305 | 0,8628 |
 | Naive Bayes gaussiano | 0,7944 | 0,0086 | 0,8232 | 0,8610 |
 | k-NN (k=5) | 0,7839 | 0,0073 | 0,8173 | 0,8310 |
 | Perceptron | 0,7228 | 0,0683 | 0,7691 | 0,7763 |
 | Decision tree | 0,7178 | 0,0191 | 0,7537 | 0,7108 |
 
-**Tre letture.** Il **decision tree senza limiti di profondità** è il peggiore: cresce fino a foglie
-pure e impara il rumore. Il **Perceptron** ha una deviazione standard dieci volte quella degli
-altri: i dati non sono linearmente separabili. E **tre modelli su otto fanno peggio del
-classificatore manuale**, un quarto lo eguaglia.
+**Tre letture.** Il **decision tree senza limiti di profondità** è il peggiore di tutti (0,7178),
+sotto perfino al Perceptron: cresce fino a foglie pure e impara il rumore. Il **Perceptron** ha una
+deviazione standard di 0,0683, sette volte quella della regressione logistica: i dati non sono
+linearmente separabili e la soluzione dipende dalla piega. E **tre modelli su cinque fanno peggio
+del classificatore manuale del Task 4**: solo la regressione logistica lo supera, il Naive Bayes lo
+eguaglia. Scikit-Learn non regala niente.
 
 ---
 
@@ -62,23 +61,35 @@ classificatore manuale**, un quarto lo eguaglia.
 | modello | StandardScaler | RobustScaler | QuantileTransformer |
 |---|---|---|---|
 | Regressione logistica | 0,8074 | 0,8074 | 0,7987 |
-| SVC (RBF) | 0,8072 | 0,8081 | 0,8060 |
+| k-NN | 0,7839 | 0,7816 | 0,7845 |
 
 **Il suggerimento del Task 3 era sbagliato, e lo diciamo.** Le code pesanti avrebbero dovuto
 penalizzare la standardizzazione: falso su questi dati, perché gli outlier sono poche decine su
-7.035. Restiamo su `StandardScaler`.
+7.035. `RobustScaler` dà alla regressione logistica lo stesso identico punteggio e al k-NN due
+millesimi in meno. Restiamo su `StandardScaler`.
 
-### 3.2 Le feature «inerti» contribuiscono comunque
+I due modelli provati sono quelli a cui lo scaling serve davvero — uno basato sul gradiente, uno
+sulle distanze. Il decision tree non compare perché è invariante a trasformazioni monotone delle
+feature: per lui lo scaler non cambia nulla per costruzione, non per un fatto sperimentale.
+
+### 3.2 Le feature «inerti»: la risposta dipende dal modello
 
 | modello | 8 feature | 5 feature | differenza | pieghe a favore di 8 |
 |---|---|---|---|---|
 | Regressione logistica | 0,8074 | 0,8047 | +0,0027 | **5/5** |
-| Random Forest | 0,7998 | 0,7916 | +0,0082 | 3/5 |
-| Gradient Boosting | 0,8017 | 0,7969 | +0,0048 | 3/5 |
+| k-NN | 0,7839 | 0,7850 | −0,0011 | 2/5 |
+| Decision tree | 0,7178 | 0,7168 | +0,0011 | 3/5 |
 
-Non sono individualmente correlate col target (fra −0,03 e +0,08), ma **in combinazione** aggiungono
-qualcosa. Conferma che tenerle era corretto, e mostra perché scartare feature guardando la sola
-correlazione sia rischioso.
+**Il risultato non è uniforme, e riportarlo così com'è è parte della risposta.** Per la regressione
+logistica — il modello che verrà scelto — togliere le tre feature peggiora il punteggio in **5 pieghe
+su 5**: piccolo, ma sistematico. Per k-NN e decision tree la differenza è di un millesimo scarso e
+cambia segno da una piega all'altra: è rumore, non un effetto.
+
+La lettura corretta è che le tre feature non sono individualmente correlate col target (fra −0,03 e
++0,08) ma **in combinazione lineare** aggiungono qualcosa, e che un modello lineare è proprio quello
+in grado di sfruttarle. Nessuna delle due letture autorizza a scartarle: un effetto piccolo ma
+sistematico non è un effetto nullo, e **scartare feature guardando la sola correlazione resta
+rischioso**.
 
 ---
 
@@ -86,18 +97,26 @@ correlazione sia rischioso.
 
 | modello | prima | dopo | guadagno | parametri scelti |
 |---|---|---|---|---|
-| Gradient Boosting | 0,8017 | **0,8095** | +0,0078 | `learning_rate=0,05`, `max_iter=100`, `max_leaf_nodes=15`, `min_samples_leaf=50` |
-| SVC (RBF) | 0,8072 | 0,8092 | +0,0020 | `C=1`, `gamma=0,05` |
-| Random Forest | 0,7998 | 0,8092 | +0,0094 | `n_estimators=300`, `min_samples_leaf=20` |
-| Regressione logistica | 0,8074 | 0,8081 | +0,0007 | `C=0,1` |
+| Regressione logistica | 0,8074 | **0,8081** | +0,0007 | `C=0,1` |
+| k-NN | 0,7839 | 0,8079 | **+0,0240** | `n_neighbors=51`, `weights='uniform'` |
+| Decision tree | 0,7178 | 0,7934 | **+0,0755** | `max_depth=5`, `min_samples_leaf=20` |
 
-**Il risultato importante è la convergenza.** I quattro modelli finiscono fra 0,8081 e 0,8095:
-**1,4 millesimi**, contro una deviazione standard di circa 0,009. Sono statisticamente
-indistinguibili. Quando un confine lineare, un kernel RBF, 300 alberi e un boosting arrivano allo
-stesso punto, il limite non è nel modello ma **nei dati**.
+Il Naive Bayes gaussiano non compare perché non ha iperparametri da tarare: entra in finale nella sua
+configurazione di default. Il Perceptron è escluso dopo il risultato della sezione 2.
 
-*(Nota tecnica: i modelli d'insieme sono definiti senza `n_jobs`, lasciando la parallelizzazione alla
-cross-validation esterna. Annidare due livelli provoca oversubscription della CPU.)*
+**L'ottimizzazione conta soprattutto per i modelli peggiori.** Il decision tree guadagna 7,6 punti e
+il k-NN 2,4: sono i due che di default andavano in overfitting, ciascuno a modo suo — l'albero
+costruendo foglie da un solo studente, il k-NN guardando un intorno di 5 vicini in uno spazio
+rumoroso. Entrambi si correggono nello stesso modo, **togliendo capacità al modello**: potando
+l'albero a profondità 5 con foglie da almeno 20 studenti, allargando l'intorno del k-NN da 5 a 51
+vicini.
+
+La regressione logistica guadagna **sette decimillesimi**: era già al suo massimo.
+
+**Il risultato importante è però la convergenza.** I due migliori arrivano allo stesso punto da
+strade opposte: 0,8081 e 0,8079, **due decimillesimi**, contro una deviazione standard di circa
+0,009. Sono statisticamente indistinguibili. Quando un confine lineare e 51 vicini danno lo stesso
+numero, il limite non è nel modello ma **nei dati**.
 
 ---
 
@@ -121,12 +140,21 @@ si stabilizzano misura il bias.
 | modello | divario finale | regime |
 |---|---|---|
 | Regressione logistica | **+0,0007** | bias: nessun overfitting |
-| Gradient Boosting | +0,0242 | varianza: memorizza, poi recupera con più dati |
+| Decision tree, default | **+0,2803** | varianza pura: memorizza il training set |
+| Decision tree, potato (sez. 4) | +0,0187 | la potatura chiude il divario |
+
+**I due estremi, misurati sullo stesso dataset.** La regressione logistica ha le curve
+*sovrapposte*: impara tutto quello che le feature contengono e nient'altro. Il decision tree
+lasciato crescere sta all'opposto: quasi il 100% di accuratezza in addestramento contro il 72% in
+validazione, cioè memorizza gli studenti invece di generalizzare.
+
+Il confronto fra le due righe dell'albero è la dimostrazione pratica del compromesso: la potatura
+della sezione 4 chiude il divario da +0,2803 a +0,0187 e alza la validazione da 0,7173 a 0,7934.
+**7,6 punti guadagnati non aggiungendo dati o feature, ma togliendo capacità al modello.**
 
 **Il dettaglio decisivo.** La curva di validazione della regressione logistica è **piatta già da 450
 campioni** (0,8061 a 450, 0,8081 a 4.502). Con dieci volte gli studenti il risultato sarebbe lo
-stesso: il limite sono le **feature**, come previsto dai Task 3 e 4. Il Gradient Boosting parte con
-un divario ampio e lo riduce, ma arriva allo stesso punto.
+stesso: il limite sono le **feature**, come previsto dai Task 3 e 4.
 
 ---
 
@@ -134,24 +162,28 @@ un divario ampio e lo riduce, ma arriva allo stesso punto.
 
 | modello | CV | test: accuratezza | test: F1 | test: ROC-AUC |
 |---|---|---|---|---|
-| **Regressione logistica** | 0,8081 | **0,7925** | **0,8272** | 0,8485 |
-| SVC (RBF) | 0,8092 | 0,7903 | 0,8255 | 0,8227 |
-| Gradient Boosting | 0,8095 | 0,7903 | 0,8255 | 0,8520 |
-| Random Forest | 0,8092 | 0,7882 | 0,8228 | 0,8552 |
+| **Regressione logistica** | **0,8081** | **0,7925** | **0,8272** | 0,8485 |
+| k-NN | 0,8079 | 0,7875 | 0,8240 | 0,8530 |
+| Naive Bayes gaussiano | 0,7944 | 0,7790 | 0,8112 | 0,8408 |
+| Decision tree | 0,7934 | 0,7747 | 0,8143 | 0,8404 |
 
 **La scelta: regressione logistica**, `C = 0,1`, `StandardScaler`.
 
-Le quattro alternative sono separate da meno di mezzo punto, cioè **meno di una deviazione
-standard**: non c'è un vincitore statistico. Quando i punteggi sono equivalenti la scelta si fa su
-altri criteri:
+È prima in **entrambe** le valutazioni, in cross-validation e sul test set. Il punto delicato è che
+il k-NN ottimizzato le sta a due decimillesimi in CV e a mezzo punto sul test set: fra i due non c'è
+un vincitore statistico, ed è corretto dirlo invece di rivendicare un primato che i numeri non
+sostengono. Quando i punteggi sono equivalenti la scelta si fa su altri criteri:
 
 | criterio | perché |
 |---|---|
-| prestazioni | la migliore sul test set, seppure di poco |
+| prestazioni | la migliore sia in CV sia sul test set, seppure di poco |
 | assenza di overfitting | learning curve sovrapposte (+0,0007) |
-| semplicità | un iperparametro contro i quattro del boosting |
-| interpretabilità | coefficienti leggibili |
-| stabilità | nessuna dipendenza da seed o algoritmi complessi |
+| semplicità | un iperparametro contro i due del k-NN |
+| interpretabilità | coefficienti leggibili; il k-NN non ne ha |
+| costo di predizione | il k-NN deve tenere in memoria tutto il training set e calcolare 5.628 distanze per ogni studente |
+
+Il criterio è stato fissato **prima** di aprire il test set: che la regressione logistica risulti
+prima anche lì è una conferma, non la motivazione della scelta.
 
 **Prestazioni dettagliate.** Precision 0,7961 e recall 0,8608 sugli abbandoni; 0,7864 e 0,6992 su
 chi prosegue. Il modello sbaglia più spesso classificando come abbandono chi prosegue (179 casi) che
@@ -223,7 +255,7 @@ mezza. Un guadagno reale ma piccolo, e dirlo è più onesto che presentarlo come
 
 **Perché il tetto è dove è.** Tre indizi indipendenti convergono:
 
-1. tutti i modelli, dal confine lineare al boosting, si fermano a 0,809;
+1. i due modelli migliori, partendo da famiglie opposte, si fermano entrambi a 0,808;
 2. la learning curve è piatta già da 450 campioni;
 3. tre feature su otto sono quasi costanti nel dataset **originale** (`FEATURE3` ha lo stesso valore
    nel 93,5% delle azioni) e le altre cinque sono correlate fino a 0,91.
@@ -242,12 +274,12 @@ come previsione dell'abbandono a corso in corso.
 | passo | risultato |
 |---|---|
 | protocollo | 80/20 stratificato, test set aperto solo alla fine |
-| modelli confrontati | 8 con parametri di default, più baseline |
+| modelli confrontati | i 5 visti a lezione, con parametri di default, più baseline |
 | scaler | `StandardScaler`; `RobustScaler` non cambia nulla |
-| feature | tutte e 8; toglierne 3 peggiora tutti i modelli |
-| tuning | guadagni fra +0,0007 e +0,0094; tutti convergono a ~0,809 |
+| feature | tutte e 8; toglierne 3 peggiora la regressione logistica in 5 pieghe su 5 |
+| tuning | +0,0755 il decision tree, +0,0240 il k-NN, +0,0007 la regressione logistica |
 | soglia di decisione | 0,5 |
-| bias-varianza | regressione logistica in regime di bias, divario +0,0007 |
+| bias-varianza | regressione logistica in regime di bias (+0,0007), albero non potato in varianza (+0,2803) |
 | **modello finale** | **regressione logistica, `C = 0,1`, `StandardScaler`** |
 | prestazioni sul test set | accuratezza 0,7925, F1 0,8272, ROC-AUC 0,8485 |
 | guadagno sui classificatori manuali | +1,5 punti |

@@ -8,7 +8,3 @@ __pycache__/
 data/act-mooc/
 data/act-mooc.tar.gz
 data/._act-mooc
-
-# artefatti generati
-*.pdf
-.assemblato.html

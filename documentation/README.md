@@ -5,16 +5,26 @@ verificano.
 
 | documento | task | contenuto |
 |---|---|---|
-| [00_sintesi.md](00_sintesi.md) | tutti | guida allo studio: filo conduttore, numeri chiave, domande d'orale |
+| [relazione.md](relazione.md) | tutti | **la relazione del progetto**: filo conduttore, i cinque task, limiti, riepilogo dei numeri |
 | [01_preprocessing.md](01_preprocessing.md) | 1 | dal livello azione al livello studente, le 8 feature, i due CSV |
 | [02.1_naive_bayes.md](02.1_naive_bayes.md) | 2 | primo classificatore manuale |
 | [02.2_decision_tree.md](02.2_decision_tree.md) | 2 | secondo classificatore manuale |
 | [03_analisi_esplorativa.md](03_analisi_esplorativa.md) | 3 | controlli di qualità, distribuzioni, correlazioni |
 | [04_valutazione.md](04_valutazione.md) | 4 | ottimizzazione dei classificatori manuali |
 | [05_modellazione.md](05_modellazione.md) | 5 | modelli Scikit-Learn e classificatore finale |
+| [2know.md](2know.md) | — | appunti di preparazione all'orale: non fa parte della relazione |
 
 Il Task 2 è diviso in due perché il gruppo è di due componenti e la consegna chiede *«uno o due
 classificatori a seconda del numero di componenti»*.
+
+`relazione.md` è il documento che espone il progetto: una sezione per task, con le decisioni
+prese, la loro motivazione e la verifica numerica che le sostiene, più i limiti, la procedura per
+il file d'esame e il riepilogo dei numeri. È il file da proiettare. Gli altri documenti restano la
+fonte di dettaglio: la relazione li riordina, non li sostituisce.
+
+`2know.md` **non fa parte della relazione**: raccoglie gli appunti di preparazione — come esporre,
+cosa dire per primo, e le venticinque domande probabili con la risposta pronta. Sta qui per non
+essere disperso, ma è materiale privato da leggere prima, non durante.
 
 ## Schema delle sezioni
 
@@ -39,15 +49,5 @@ Dove una scelta ne escludeva altre, c'è **Alternative scartate** con una riga p
 5. **Nessun ciclo Python sui dati.** Ogni calcolo che tocca righe, colonne o soglie candidate è
    scritto come operazione su array o su `DataFrame`. I `for` rimasti scorrono modelli, pieghe di
    cross-validation, iperparametri o assi di un grafico — cose che non si possono vettorizzare
-   perché ogni giro fa una cosa diversa. La motivazione è nella sezione 9 di
-   [00_sintesi.md](00_sintesi.md).
-
-## Produrre il PDF
-
-```bash
-./costruisci_pdf.sh
-```
-
-Assembla frontespizio, indice e i sette documenti in `../../progetto_ML_2026.pdf`, fuori dal
-progetto: è un artefatto generato, i sorgenti sono i `.md` qui accanto. Serve
-`sudo dnf install pandoc-cli python3-weasyprint`.
+   perché ogni giro fa una cosa diversa. La motivazione, con la tabella dei `for` legittimi, è
+   in «Come è scritto il codice» di [relazione.md](relazione.md).

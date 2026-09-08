@@ -15,7 +15,7 @@ una baseline del 57,71%.
 ```
 data/            manuale.csv (12 studenti), training.csv (7.035), act-mooc/ (grezzi, non versionati)
 notebooks/       i sei notebook, in ordine, + preprocessing.py
-documentation/   i sette .md e lo script che li assembla in un PDF
+documentation/   la relazione per l'orale, i sette .md di motivazioni e le figure
 ```
 
 ## Far girare il progetto
@@ -50,7 +50,7 @@ diversa e non c'è niente da vettorizzare.
 
 Il Task 4 passa così da **67,7 a 6,6 secondi**, a parità di risultati: le due versioni sono state
 confrontate riga per riga e i notebook 04 e 05 producono output identici al carattere. Motivazione
-estesa nella sezione 9 di `documentation/00_sintesi.md`.
+estesa in `documentation/relazione.md`, sezione «Come è scritto il codice».
 
 ## Usare il modello sul file d'esame
 
@@ -66,15 +66,6 @@ previsioni = finale.predict(X)                      # `finale` viene da 05_model
 `carica_per_predire` accetta entrambi i formati e restituisce `y = None` se manca la colonna delle
 etichette. Il modello non è salvato su disco: si riottiene eseguendo `05_modellazione.ipynb`, meno
 di un minuto.
-
-## Produrre il PDF
-
-```bash
-cd documentation && ./costruisci_pdf.sh
-```
-
-Scrive `progetto_ML_2026.pdf` **fuori dal progetto**, in `machine_learning/`. Serve
-`sudo dnf install pandoc-cli python3-weasyprint`.
 
 ## Limiti dichiarati
 
