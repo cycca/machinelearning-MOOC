@@ -1,7 +1,4 @@
 """
-Previsioni sul file d'esame, da riga di comando e senza aprire i notebook.
-
-    python predici.py ../data/real_settings.csv
 
 Ricostruisce il classificatore finale del Task 5 — regressione logistica con
 `C = 0,1` e `StandardScaler`, addestrata sullo stesso 80% di `training.csv` usato

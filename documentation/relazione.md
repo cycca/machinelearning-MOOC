@@ -55,7 +55,7 @@ numero di righe**. È il tipo di errore che un controllo su `len()` non vede.
 ```python
 dati = azioni.copy()
 dati[COLONNE_FEATURE] = feature[COLONNE_FEATURE].to_numpy()   # affianca per posizione
-dati["LABEL"] = etichette["LABEL"].to_numpy()
+dati["LABEL"] = etichette["LABEL"].to_numpy()               # idem: nessun merge
 ```
 
 ### b. Il cambio di unità di analisi
@@ -75,8 +75,10 @@ Non solo di chi abbandona. Se la togliessimo ai soli positivi, la regola di cost
 feature dipenderebbe dal target: sarebbe **leakage**.
 
 ```python
+# via l'ultima azione di OGNI studente: e' quella su cui l'etichetta e' definita
 storia = dati.drop(index=dati.groupby("USERID").tail(1).index)
 
+# un solo groupby, otto aggregazioni: pandas scorre le 404.702 righe una volta sola
 gruppi = storia.assign(GIORNO=storia["TIMESTAMP"] // 86400).groupby("USERID")
 studenti = pd.concat([
     pd.DataFrame({
@@ -85,6 +87,7 @@ studenti = pd.concat([
         "n_giorni_attivi":     gruppi["GIORNO"].nunique(),
         "durata_giorni":       (gruppi["TIMESTAMP"].max() - gruppi["TIMESTAMP"].min()) / 86400,
     }),
+    # le quattro medie da UNA chiamata su tutte e quattro le colonne, non da un ciclo
     gruppi[COLONNE_FEATURE].mean().rename(columns=lambda c: c.lower() + "_media"),
 ], axis=1)
 ```
@@ -406,7 +409,7 @@ usata in addestramento.
 ```python
 import preprocessing as pp
 X_esame, y_esame = pp.carica_per_predire("real_settings.csv")   # log di azioni O tabella aggregata
-previsioni = finale.predict(X_esame)
+previsioni = finale.predict(X_esame)                             # y_esame e' None se non etichettato
 ```
 
 La funzione accetta **entrambi i formati possibili** e restituisce `y = None` se manca la colonna
