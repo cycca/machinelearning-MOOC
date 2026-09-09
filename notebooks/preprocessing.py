@@ -2,14 +2,14 @@
 Preprocessing del dataset act-mooc — dal livello azione al livello studente.
 
 Impacchetta la trasformazione del Task 1 in una funzione richiamabile, perché serve
-due volte: in addestramento, per costruire `manuale.csv` e `training.csv`; e in sede
-d'esame, su `real_settings.csv`.
+ogni volta che il modello va applicato a dati nuovi e non solo per costruire
+`manuale.csv` e `training.csv`.
 
-Le otto feature sono definite da noi e non compaiono nel dataset originale, quindi un
-file d'esame va trasformato prima di poterlo dare al modello. `costruisci_studenti`
-accetta sia un log di azioni sia una tabella già a livello studente, così il percorso
-di preprocessing è identico a quello usato in addestramento qualunque sia il formato
-ricevuto.
+Le otto feature sono definite da noi e non compaiono nel dataset originale, quindi
+qualunque tabella nuova va trasformata prima di poterla dare al modello.
+`costruisci_studenti` accetta sia un log di azioni sia una tabella già a livello
+studente, così il percorso di preprocessing è identico a quello dell'addestramento
+qualunque sia il formato ricevuto.
 """
 
 from pathlib import Path
@@ -26,7 +26,7 @@ COLONNE_STUDENTE = ["n_azioni", "n_attivita_distinte", "n_giorni_attivi", "durat
                     "feature0_media", "feature1_media", "feature2_media", "feature3_media"]
 SECONDI_IN_UN_GIORNO = 86400
 
-# Nomi che nel dataset grezzo sono maiuscoli: un file d'esame potrebbe averli in minuscolo.
+# Nomi che nel dataset grezzo sono maiuscoli: un file nuovo potrebbe averli in minuscolo.
 COLONNE_GREZZE = {"ACTIONID", "USERID", "TARGETID", "TIMESTAMP", "LABEL", "ABBANDONO",
                   *COLONNE_FEATURE}
 N_AZIONI_MEDIANA_TRAINING = 37      # mediana di training.csv, per riconoscere un log troncato
@@ -113,7 +113,7 @@ def costruisci_studenti(df, verbose=False):
 
 
 def carica_per_predire(percorso, cartella_grezzi=None):
-    """Prepara un file d'esame (`real_settings.csv`) per il classificatore finale.
+    """Prepara un file di dati nuovi per il classificatore finale.
 
     Restituisce `(X, y)`, dove `y` è `None` se il file non è etichettato. Qualunque
     sia il formato del file — log di azioni o tabella già a livello studente — X ha

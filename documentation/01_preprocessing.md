@@ -191,15 +191,15 @@ storia.
 
 ---
 
-## 9. `preprocessing.py` e il file d'esame
+## 9. `preprocessing.py`, il preprocessing come modulo
 
 **Cosa.** La trasformazione impacchettata in due funzioni: `costruisci_studenti` (log di azioni →
 tabella studente) e `carica_per_predire` (legge un file e restituisce `X, y`).
 
-**Perché.** Le 8 feature sono definite da noi e non esistono nel dataset originale, quindi
-`real_settings.csv` va trasformato prima di darlo al modello. Rifacendo la trasformazione fuori dal
-modulo, ogni minima differenza rispetto all'addestramento cambierebbe i risultati senza che ce ne
-accorgiamo. Il modulo garantisce che sia la stessa.
+**Perché.** Le 8 feature sono definite da noi e non esistono nel dataset originale: qualunque
+tabella su cui si voglia usare il modello va costruita con la **stessa** trasformazione
+dell'addestramento. Rifacendola fuori dal modulo, ogni minima differenza cambierebbe i risultati
+senza che ce ne accorgiamo. Il modulo garantisce che sia la stessa.
 
 `costruisci_studenti` accetta tre formati:
 
@@ -214,8 +214,8 @@ regressione logistica dà **F1 = 0,000** (average precision 0,031 contro 0,0099 
 casuale). Il modello impara a rispondere sempre 0 perché i positivi sono lo 0,99%.
 
 **Limite dichiarato.** `n_azioni` e `durata_giorni` dipendono dall'ampiezza della finestra di
-osservazione (29,77 giorni). Un file d'esame con una finestra diversa produrrebbe feature su scala
-diversa.
+osservazione (29,77 giorni). Storie osservate per un periodo diverso produrrebbero feature su una
+scala diversa e non confrontabile.
 
 **Verificato.** Il modulo riproduce la tabella del notebook e `training.csv` con `.equals()` →
 `True`.
@@ -232,4 +232,4 @@ diversa.
 | target | `ABBANDONO`, 57,7% di positivi (era 0,99% a livello azione) |
 | feature | 8 per studente, escludendo l'ultima azione di ognuno |
 | `manuale.csv` / `training.csv` | 12 (6+6) / 7.035 |
-| `preprocessing.py` | stessa trasformazione richiamabile sul file d'esame |
+| `preprocessing.py` | la stessa trasformazione, richiamabile come funzione |

@@ -14,7 +14,7 @@ una baseline del 57,71%.
 
 ```
 data/            manuale.csv (12 studenti), training.csv (7.035), act-mooc/ (grezzi, non versionati)
-notebooks/       i sei notebook, in ordine, + preprocessing.py e predici.py
+notebooks/       i sei notebook, in ordine, + preprocessing.py
 documentation/   relazione.md, un .md di motivazioni per task, le figure
 ```
 
@@ -56,29 +56,6 @@ diversa e non c'è niente da vettorizzare.
 Il Task 4 passa così da **67,7 a 6,6 secondi**, a parità di risultati: le due versioni sono state
 confrontate riga per riga e i notebook 04 e 05 producono output identici al carattere. Motivazione
 estesa in `documentation/relazione.md`, sezione «Come è scritto il codice».
-
-## Usare il modello sul file d'esame
-
-Le 8 feature sono definite da noi e non esistono nel dataset originale, quindi `real_settings.csv`
-va trasformato prima di darlo al modello.
-
-Copia il file in `data/real_settings.csv` e scegli una delle due strade.
-
-**Dal notebook.** Apri `05_modellazione.ipynb` ed esegui tutte le celle: l'ultima cella di codice
-della sezione 8 rileva il file, lo trasforma, predice e salva `data/previsioni.csv`. Se il file non
-c'è, quella cella stampa un avviso e non fa altro.
-
-**Da terminale**, senza aprire niente:
-
-```bash
-cd notebooks
-python predici.py ../data/real_settings.csv
-```
-
-Entrambe le strade passano per `preprocessing.carica_per_predire`, che accetta log di azioni o
-tabella già a livello studente, con o senza etichette: se le etichette ci sono stampa anche
-l'accuratezza, altrimenti solo le previsioni. Il modello non è salvato su disco — si riaddestra in
-un secondo, e sullo stesso seme dà previsioni identiche nei due percorsi.
 
 ## Limiti dichiarati
 

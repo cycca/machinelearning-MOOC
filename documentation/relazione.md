@@ -390,54 +390,13 @@ Sono cinque, e ognuno è quantificato, non soltanto dichiarato.
    `FEATURE3` ha lo stesso valore nel 93,5% delle azioni. Le teniamo perché in combinazione
    contribuiscono, ma non ci si deve aspettare nulla da loro.
 4. **La finestra di osservazione è di 29,77 giorni.** `n_azioni` e `durata_giorni` dipendono da
-   quella ampiezza: un file d'esame con una finestra diversa produrrebbe feature su scala diversa.
-   Misurato nel Task 5: su storie complete il modello fa 0,7833, su una fetta del log **0,05–0,22**.
-   `preprocessing.py` avvisa quando la mediana di `n_azioni` è meno di un terzo di quella di
-   `training.csv`.
+   quella ampiezza: gli stessi studenti osservati per una settimana invece che per un mese
+   darebbero feature su una scala diversa, e il modello risponderebbe «abbandona» quasi a tutti.
+   Le feature descrivono storie **complete**, e fuori da quella condizione non sono confrontabili
+   con quelle di addestramento.
 5. **Un nostro suggerimento si è rivelato sbagliato.** Il Task 3 proponeva `RobustScaler` per via
    delle code pesanti. Il Task 5 lo ha verificato: non cambia niente. L'abbiamo riportato invece di
    rimuoverlo.
-
----
-
-## Il file d'esame `real_settings.csv`
-
-Le otto feature sono definite da noi e **non esistono nel dataset originale**: il file va
-trasformato prima di darlo al modello. `preprocessing.py` lo fa con la stessa identica funzione
-usata in addestramento.
-
-```python
-import preprocessing as pp
-X_esame, y_esame = pp.carica_per_predire("real_settings.csv")   # log di azioni O tabella aggregata
-previsioni = finale.predict(X_esame)                             # y_esame e' None se non etichettato
-```
-
-La funzione accetta **entrambi i formati possibili** e restituisce `y = None` se manca la colonna
-delle etichette. Verificata end-to-end su tutti e due: log di azioni → 200 studenti, colonne
-corrette, accuratezza **0,8050**; tabella già a livello studente → 50 studenti, **0,8200**.
-
-### Il caso da temere, e come lo abbiamo misurato
-
-Se `real_settings.csv` contenesse una *fetta* del log invece di storie complete, ogni studente
-avrebbe una storia troncata, `n_azioni` cadrebbe di un ordine di grandezza e il modello
-risponderebbe «abbandona» quasi a tutti.
-
-| contenuto del file | studenti | previsti «abbandona» | accuratezza |
-|---|---|---|---|
-| storie **complete** di 300 studenti | 300 | 61% | **0,7833** |
-| 3.000 azioni estratte a caso | 624 | 95% | 0,0625 |
-| prime 3.000 righe del log | 309 | 100% | 0,0453 |
-| azioni dei primi 7 giorni | 3.776 | 100% | 0,2238 |
-
-`preprocessing.py` intercetta i primi due casi con un avviso, quando la mediana di `n_azioni` scende
-sotto un terzo di quella di `training.csv` (37). **Il terzo sfugge**: una finestra temporale
-iniziale produce storie brevi ma verosimili, e nessun controllo sul solo file può distinguerle da
-storie complete. In quel caso il numero da riportare non è l'accuratezza, ma il fatto che il file
-non è confrontabile con i dati di addestramento.
-
-**Il modello non è salvato su disco:** l'addestramento dura meno di un secondo, e rieseguire il
-notebook evita ogni problema di compatibilità fra versioni di Scikit-Learn nel caricare un oggetto
-serializzato.
 
 ---
 

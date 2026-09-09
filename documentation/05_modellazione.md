@@ -212,42 +212,7 @@ identiche un'unica quantità di informazione.
 
 ---
 
-## 8. Il file d'esame `real_settings.csv`
-
-Le otto feature non esistono nel dataset originale, quindi `real_settings.csv` va trasformato prima
-di poterlo dare al modello. `preprocessing.py` lo fa con la stessa identica funzione usata in
-addestramento e accetta entrambi i formati possibili.
-
-**Verificato end-to-end** su un file finto di 200 studenti: log di azioni → 200 studenti, colonne
-corrette, accuratezza 0,8050; tabella già a livello studente → 50 studenti, accuratezza 0,8200.
-
-**Il caso da temere: un file che è solo una fetta del log.** Le feature descrivono la storia
-*completa* di uno studente. Se il file d'esame ne contenesse un frammento, le storie sarebbero
-troncate e il modello risponderebbe «abbandona» quasi a tutti:
-
-| contenuto del file d'esame | studenti | previsti «abbandona» | accuratezza |
-|---|---|---|---|
-| storie **complete** di 300 studenti | 300 | 61% | **0,7833** |
-| 3.000 azioni estratte a caso | 624 | 95% | 0,0625 |
-| prime 3.000 righe del log | 309 | 100% | 0,0453 |
-| azioni dei primi 7 giorni | 3.776 | 100% | 0,2238 |
-
-`preprocessing.py` intercetta i primi due casi con un avviso, quando la mediana di `n_azioni` scende
-sotto un terzo di quella di `training.csv`. Il terzo sfugge: una finestra temporale iniziale produce
-storie brevi ma verosimili. È il limite 4 del Task 1, qui misurato invece che solo dichiarato.
-
-```python
-import preprocessing as pp
-X_esame, y_esame = pp.carica_per_predire("real_settings.csv")
-previsioni = finale.predict(X_esame)
-```
-
-**Il modello non è salvato su disco**: l'addestramento dura meno di un secondo, e rieseguire il
-notebook evita ogni problema di compatibilità fra versioni di Scikit-Learn.
-
----
-
-## 9. Conclusioni
+## 8. Conclusioni
 
 **Quanto è servito Scikit-Learn.** Il miglior classificatore manuale arrivava a 0,7933 in
 cross-validation, contro 0,8081 del modello finale: **+1,5 punti**, circa una deviazione standard e
