@@ -17,11 +17,6 @@ omonimi in `documentation/`; i numeri sono tutti riproducibili eseguendo i noteb
 
 ---
 
-## Il filo conduttore
-
-Il progetto racconta una sola storia. Tutto ciò che segue ne è una conferma, ottenuta per strade
-indipendenti.
-
 > Il dataset non è tabellare: è una **sequenza di eventi**. Il lavoro vero è stato cambiare l'unità
 > di analisi — dall'azione allo studente — perché l'etichetta descrive lo studente, non l'azione.
 > Quel passaggio ha dissolto uno sbilanciamento apparente e ha reso il problema trattabile. Da lì in
